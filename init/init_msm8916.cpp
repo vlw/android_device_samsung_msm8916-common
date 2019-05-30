@@ -27,22 +27,17 @@
    IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-
 #include <android-base/file.h>
-#include <android-base/logging.h>
-#include <android-base/properties.h>
 #include <android-base/strings.h>
 
-#include "property_service.h"
-#include "vendor_init.h"
+#define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
+#include <sys/_system_properties.h>
 
-#include "init_msm8916.h"
+#define SIMSLOT_FILE "/proc/simslot_count"
+#define SERIAL_NUMBER_FILE "/efs/FactoryApp/serial_no"
+#define BT_ADDR_FILE "/efs/bluetooth/bt_addr"
+
+#include <init_msm8916.h>
 
 using android::base::GetProperty;
 using android::base::ReadFileToString;
@@ -81,6 +76,124 @@ static void init_alarm_boot_properties()
         else
             property_set("ro.alarm_boot", "false");
     }
+}
+
+void property_override(char const prop[], char const value[])
+{
+    prop_info *pi;
+
+    pi = (prop_info*) __system_property_find(prop);
+    if (pi)
+        __system_property_update(pi, value, strlen(value));
+    else
+        __system_property_add(prop, strlen(prop), value, strlen(value));
+}
+
+void property_override_dual(char const system_prop[], char const vendor_prop[], char const value[])
+{
+    property_override(system_prop, value);
+    property_override(vendor_prop, value);
+}
+
+void set_cdma_properties(const char *operator_alpha, const char *operator_numeric, const char * network)
+{
+	/* Dynamic CDMA Properties */
+	property_set("ro.cdma.home.operator.alpha", operator_alpha);
+	property_set("ro.cdma.home.operator.numeric", operator_numeric);
+	property_set("ro.telephony.default_network", network);
+
+	/* Static CDMA Properties */
+	property_set("ril.subscription.types", "NV,RUIM");
+	property_set("ro.telephony.default_cdma_sub", "0");
+	property_set("ro.telephony.get_imsi_from_sim", "true");
+	property_set("ro.telephony.ril.config", "newDriverCallU,newDialCode");
+	property_set("telephony.lteOnCdmaDevice", "1");
+}
+
+void set_dsds_properties()
+{
+	property_set("ro.multisim.simslotcount", "2");
+	property_set("ro.telephony.ril.config", "simactivation");
+	property_set("persist.radio.multisim.config", "dsds");
+}
+
+void set_gsm_properties()
+{
+	property_set("telephony.lteOnCdmaDevice", "0");
+    property_set("telephony.lteOnGsmDevice", "0");
+	property_set("ro.telephony.default_network", "9");
+}
+
+void set_lte_properties()
+{
+	property_set("persist.radio.lte_vrte_ltd", "1");
+	property_set("telephony.lteOnCdmaDevice", "0");
+	property_set("telephony.lteOnGsmDevice", "1");
+	property_set("ro.telephony.default_network", "10");
+}
+
+void set_wifi_properties()
+{
+	property_set("ro.carrier", "wifi-only");
+	property_set("ro.radio.noril", "1");
+}
+
+void set_fingerprint()
+{
+	std::string fingerprint = GetProperty("ro.build.fingerprint", "");
+
+	if ((strlen(fingerprint.c_str()) > 1) && (strlen(fingerprint.c_str()) <= PROP_VALUE_MAX))
+		return;
+
+	char new_fingerprint[PROP_VALUE_MAX+1];
+
+	std::string build_id = GetProperty("ro.build.id","");
+	std::string build_tags = GetProperty("ro.build.tags","");
+	std::string build_type = GetProperty("ro.build.type","");
+	std::string device = GetProperty("ro.product.device","");
+	std::string incremental_version = GetProperty("ro.build.version.incremental","");
+	std::string release_version = GetProperty("ro.build.version.release","");
+
+	snprintf(new_fingerprint, PROP_VALUE_MAX, "samsung/%s/%s:%s/%s/%s:%s/%s",
+		device.c_str(), device.c_str(), release_version.c_str(), build_id.c_str(),
+		incremental_version.c_str(), build_type.c_str(), build_tags.c_str());
+
+	property_override_dual("ro.build.fingerprint", "ro.boot.fingerprint", new_fingerprint);
+}
+
+void set_target_properties(const char *device, const char *model)
+{
+	property_override_dual("ro.product.device", "ro.product.vendor.model", device);
+	property_override_dual("ro.product.model", "ro.product.vendor.device", model);
+
+	property_set("ro.ril.telephony.mqanelements", "6");
+
+	/* check and/or set fingerprint */
+	set_fingerprint();
+
+	/* check for multi-sim devices */
+    std::string sim_count;
+    if (ReadFileToString(SIMSLOT_FILE, &sim_count)) {
+        if (Trim(sim_count) == "2")
+            set_dsds_properties();
+    }
+
+	char const *serial_number_file = SERIAL_NUMBER_FILE;
+	std::string serial_number;
+
+	char const *bt_addr_file = BT_ADDR_FILE;
+	std::string bt_address;
+
+	if (ReadFileToString(serial_number_file, &serial_number)) {
+		serial_number = Trim(serial_number);
+		property_override("ro.serialno", serial_number.c_str());
+	}
+
+	if (ReadFileToString(bt_addr_file, &bt_address)) {
+		bt_address = Trim(bt_address);
+		property_override("persist.service.bdroid.bdaddr", bt_address.c_str());
+	}
+
 }
 
 void vendor_load_properties()
