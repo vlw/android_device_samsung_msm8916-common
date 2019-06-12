@@ -204,6 +204,9 @@ TARGET_LD_SHIM_LIBS := \
     /system/vendor/lib/libsec-ril.so|libshim_secril.so \
     /system/vendor/lib/libsec-ril-dsds.so|libshim_secril.so
 
+# Shipping API level (for CTS backward compatibility)
+PRODUCT_SHIPPING_API_LEVEL := 19
+
 # Wi-Fi
 BOARD_HAS_QCOM_WLAN := true
 BOARD_HOSTAPD_DRIVER := NL80211
