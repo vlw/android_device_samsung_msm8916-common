@@ -105,9 +105,6 @@ PRODUCT_PACKAGES += \
 
 # GPS
 PRODUCT_PACKAGES += \
-    libshims_get_process_name
-
-PRODUCT_PACKAGES += \
     android.hardware.gnss@1.0-impl \
     android.hardware.gnss@1.0-service
 
@@ -227,10 +224,6 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     android.hardware.renderscript@1.0-impl \
     android.hardware.renderscript@1.0-service
-
-# RIL
-PRODUCT_PACKAGES += \
-    libshim_secril \
 
 # Seccomp
 PRODUCT_COPY_FILES += \

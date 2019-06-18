@@ -203,11 +203,6 @@ include device/qcom/sepolicy-legacy/sepolicy.mk
 BOARD_SEPOLICY_DIRS += \
     $(PLATFORM_PATH)/sepolicy
 
-# Shims
-TARGET_LD_SHIM_LIBS := \
-    /system/vendor/lib/libsec-ril.so|libshim_secril.so \
-    /system/vendor/lib/libsec-ril-dsds.so|libshim_secril.so
-
 # Shipping API level (for CTS backward compatibility)
 PRODUCT_SHIPPING_API_LEVEL := 19
 
