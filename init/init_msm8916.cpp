@@ -192,6 +192,7 @@ void set_target_properties(const char *device, const char *model)
 	if (ReadFileToString(bt_addr_file, &bt_address)) {
 		bt_address = Trim(bt_address);
 		property_override("persist.service.bdroid.bdaddr", bt_address.c_str());
+        property_override("ro.boot.btmacaddr", bt_address.c_str());
 	}
 
 }
