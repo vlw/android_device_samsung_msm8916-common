@@ -217,18 +217,8 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     qti-telephony-common
 
-PRODUCT_PACKAGES += \
-    ims-ext-common \
-    libwpa_client
-
 PRODUCT_BOOT_JARS += \
     telephony-ext
-
-
-# Qualcomm broadcast whitelist
-PRODUCT_COPY_FILES += \
-    $(LOCAL_PATH)/configs/qti_whitelist.xml:$(TARGET_COPY_OUT_VENDOR)/etc/sysconfig/qti_whitelist.xml \
-    $(LOCAL_PATH)/configs/privapp-permissions-qti.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/privapp-permissions-qti.xml
 
 # Recovery
 PRODUCT_PACKAGES += \
