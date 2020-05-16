@@ -33,6 +33,9 @@
 /sys/devices/soc\.0/[a-z0-9]+\.usb/power_supply(/.*)?   u:object_r:sysfs_batteryinfo:s0
 /sys/devices/msm_dwc3/power_supply(/.*)?                u:object_r:sysfs_batteryinfo:s0
 
+# rootfs
+/firmware-modem                                         u:object_r:firmware_file:s0
+
 # sysfs - iio
 /sys/bus/iio/devices(/.*)?                                                          u:object_r:sysfs_iio:s0
 /sys/devices/[a-f0-9]+\.spi/spi_master/spi[0-9]+/spi[0-9]+\.0/iio:device[0-9](/.*)? u:object_r:sysfs_iio:s0
