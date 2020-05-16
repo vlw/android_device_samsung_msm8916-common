@@ -120,6 +120,8 @@ BOARD_CACHEIMAGE_FILE_SYSTEM_TYPE := ext4
 TARGET_EXFAT_DRIVER := sdfat
 TARGET_FS_CONFIG_GEN += $(PLATFORM_PATH)/config.fs
 BOARD_ROOT_EXTRA_FOLDERS := efs firmware firmware-modem
+BOARD_ROOT_EXTRA_SYMLINKS := \
+    /data/tombstones:/tombstones
 
 # FM
 AUDIO_FEATURE_ENABLED_FM_POWER_OPT := true
