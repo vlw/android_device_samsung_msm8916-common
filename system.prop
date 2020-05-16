@@ -33,6 +33,7 @@ ro.bt.bdaddr_path=/efs/bluetooth/bt_addr
 
 # Display
 debug.hwui.use_buffer_age=false
+debug.sf.enable_gl_backpressure=1
 debug.composition.type=c2d
 debug.mdpcomp.idletime=600
 persist.hwc.mdpcomp.enable=true
