@@ -3,3 +3,6 @@ ro.opengles.version=196608
 
 # Perf
 ro.min_freq_0=800000
+
+# fastbootd
+ro.fastbootd.available=true
