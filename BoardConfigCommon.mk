@@ -76,8 +76,10 @@ USE_DEVICE_SPECIFIC_GPS := true
 TARGET_BOOTANIMATION_HALF_RES := true
 
 # Camera
+TARGET_HAS_LEGACY_CAMERA_HAL1 := true
 TARGET_PROCESS_SDK_VERSION_OVERRIDE := \
-    /system/vendor/bin/mm-qcamera-daemon=23
+    /system/vendor/bin/mm-qcamera-daemon=22 \
+    /system/bin/mediaserver=22
 
 # Dexpreopt
 # Always preopt extracted APKs to prevent extracting out of the APK
@@ -182,7 +184,7 @@ TARGET_SPECIFIC_HEADER_PATH += $(PLATFORM_PATH)/include
 
 TARGET_PROCESS_SDK_VERSION_OVERRIDE += \
     /vendor/bin/hw/rild=27 \
-    /system/vendor/bin/hw/rild=27 
+    /system/vendor/bin/hw/rild=27
 
 # Recovery
 TARGET_RECOVERY_UPDATER_LIBS := librecovery_updater_cm
@@ -195,7 +197,8 @@ BOARD_SEPOLICY_DIRS += \
 # Shims
 TARGET_LD_SHIM_LIBS := \
     /system/vendor/lib/libflp.so|libshims_flp.so \
-    /system/vendor/lib/libizat_core.so|libshims_get_process_name.so
+    /system/vendor/lib/libizat_core.so|libshims_get_process_name.so \
+    /system/vendor/lib/hw/camera.vendor.msm8916.so|libshim_camera.so
 
 # Shipping API level (for CTS backward compatibility)
 PRODUCT_SHIPPING_API_LEVEL := 19
