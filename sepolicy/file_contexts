@@ -36,6 +36,8 @@
 # rootfs
 /firmware-modem                                         u:object_r:firmware_file:s0
 /tombstones                                             u:object_r:rootfs:s0
+/hidden                                                 u:object_r:rootfs:s0
+/persist                                                u:object_r:rootfs:s0
 
 # sysfs - iio
 /sys/bus/iio/devices(/.*)?                                                          u:object_r:sysfs_iio:s0
