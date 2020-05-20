@@ -229,13 +229,6 @@ PRODUCT_PACKAGES += \
     librmnetctl \
     libxml2
 
-# Manual SIM Provision
-PRODUCT_PACKAGES += \
-    qti-telephony-common
-
-PRODUCT_BOOT_JARS += \
-    telephony-ext
-
 # RenderScript HAL
 PRODUCT_PACKAGES += \
     android.hardware.renderscript@1.0-impl \
