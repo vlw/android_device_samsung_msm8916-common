@@ -181,6 +181,9 @@ TARGET_PROCESS_SDK_VERSION_OVERRIDE += \
     /vendor/bin/hw/rild=27 \
     /system/vendor/bin/hw/rild=27
 
+# Security patch level
+VENDOR_SECURITY_PATCH := 2017-08-01
+
 # SELinux
 include device/qcom/sepolicy-legacy/sepolicy.mk
 BOARD_SEPOLICY_DIRS += \
