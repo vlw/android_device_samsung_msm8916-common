@@ -15,8 +15,6 @@
 
 LOCAL_PATH := $(call my-dir)
 
-include $(call all-makefiles-under,$(LOCAL_PATH))
-
 include $(CLEAR_VARS)
 
 LOCAL_SRC_FILES := \
@@ -36,5 +34,15 @@ LOCAL_SRC_FILES := \
 LOCAL_MODULE := libshims_get_process_name
 LOCAL_MODULE_TAGS := optional
 LOCAL_VENDOR_MODULE := true
+
+include $(BUILD_SHARED_LIBRARY)
+
+include $(CLEAR_VARS)
+
+LOCAL_SRC_FILES := libshim_binder/libbinder_interface.cpp
+LOCAL_MODULE := libshim_binder
+LOCAL_MODULE_CLASS := SHARED_LIBRARIES
+LOCAL_VENDOR_MODULE := true
+LOCAL_SHARED_LIBRARIES := libbinder libutils
 
 include $(BUILD_SHARED_LIBRARY)
