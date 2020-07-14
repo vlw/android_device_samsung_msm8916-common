@@ -24,6 +24,12 @@
 /sys/devices/virtual/input(/.*)?                        u:object_r:sysfs_input:s0
 /sys/devices/virtual/camera(/.*)?                       u:object_r:sysfs_camera:s0
 
+# device nodes
+/dev/alarm                                              u:object_r:alarm_device:s0
+/dev/rfkill                                             u:object_r:wlan_device:s0
+/dev/sec-nfc                                            u:object_r:nfc_device:s0
+/dev/i2c-1                                              u:object_r:audio_device:s0
+
 # sysfs - battery/charger
 /sys/devices/battery\.[0-9]+/power_supply(/.*)?         u:object_r:sysfs_batteryinfo:s0
 /sys/devices/i2c\.[0-9]+/i2c-[0-9]+/[0-9]+-[a-z0-9]+/max[a-z0-9]+-charger/power_supply(/.*)? u:object_r:sysfs_batteryinfo:s0

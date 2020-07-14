@@ -1,3 +1,4 @@
+type alarm_device, dev_type, mlstrustedobject;
 type proc_kernel_sched, fs_type;
 type sysfs_mdnie, fs_type, sysfs_type;
 type sysfs_iio, fs_type, sysfs_type;
