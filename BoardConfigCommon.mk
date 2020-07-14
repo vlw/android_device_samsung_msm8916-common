@@ -191,9 +191,8 @@ BOARD_SEPOLICY_DIRS += \
 
 # Shims
 TARGET_LD_SHIM_LIBS := \
-    /system/vendor/lib/libflp.so|libshims_flp.so \
-    /system/vendor/lib/libizat_core.so|libshims_get_process_name.so \
-    /system/vendor/lib/hw/camera.vendor.msm8916.so|libshim_camera.so
+    /system/vendor/lib/hw/camera.vendor.msm8916.so|libshim_camera.so \
+    /system/vendor/lib/libperipheral_client.so|libshim_binder.so
 
 # Wi-Fi
 BOARD_HAS_QCOM_WLAN := true
