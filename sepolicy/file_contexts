@@ -29,6 +29,7 @@
 /dev/rfkill                                             u:object_r:wlan_device:s0
 /dev/sec-nfc                                            u:object_r:nfc_device:s0
 /dev/i2c-1                                              u:object_r:audio_device:s0
+/dev/stune(/.*)?                                        u:object_r:cgroup:s0
 
 # sysfs - battery/charger
 /sys/devices/battery\.[0-9]+/power_supply(/.*)?         u:object_r:sysfs_batteryinfo:s0
