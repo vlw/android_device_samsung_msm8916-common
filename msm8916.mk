@@ -91,7 +91,8 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/external_camera_config.xml:$(TARGET_COPY_OUT_VENDOR)/etc/external_camera_config.xml
 
 PRODUCT_PACKAGES += \
-    libshim_camera
+    libshim_camera \
+    libstagefright_shim
 
 # Display
 PRODUCT_PACKAGES += \
