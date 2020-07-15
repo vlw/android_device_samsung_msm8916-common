@@ -31,3 +31,5 @@ const char _ZN7android16CameraParameters25KEY_DYNAMIC_RANGE_CONTROLE[] = "dynami
 const char _ZN7android16CameraParameters35KEY_SUPPORTED_DYNAMIC_RANGE_CONTROLE[] = "dynamic-range-control-values";
 const char _ZN7android16CameraParameters7DRC_OFFE[] = "off";
 const char _ZN7android16CameraParameters6DRC_ONE[] = "on";
+
+const char _ZN7android16CameraParameters26PIXEL_FORMAT_YUV420SP_NV21E[] = "nv21";
