@@ -53,7 +53,7 @@ ro.qc.sdk.izat.service_mask=0x0
 
 # Other
 ro.oem_unlock_supported=0
-ro.frp.pst=/dev/block/bootdevice/by-name/hidden
+ro.frp.pst=/dev/block/bootdevice/by-name/persist
 
 # Media
 drm.service.enabled=1
