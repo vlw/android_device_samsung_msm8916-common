@@ -30,23 +30,6 @@
 #ifndef __INIT_MSM8916__H__
 #define __INIT_MSM8916__H__
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <fcntl.h>
-#include <unistd.h>
-
-#include <android-base/properties.h>
-#include <android-base/file.h>
-#include <android-base/strings.h>
-
-#include "vendor_init.h"
-#include "property_service.h"
-//#include "log.h"
-//#include "util.h"
-
-void init_target_properties();
-
 void set_dsds_properties();
 void set_gsm_properties();
 void set_lte_properties();

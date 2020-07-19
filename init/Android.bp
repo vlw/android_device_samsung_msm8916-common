@@ -15,11 +15,10 @@
 //
 
 cc_library_static {
-    name: "libinit_msm8916",
+    name: "libinit_helpers_msm8916",
     recovery_available: true,
     srcs: ["init_msm8916.cpp"],
     include_dirs: [
-        "device/samsung/msm8916-common/include",
         "system/core/base/include",
         "system/core/init",
     ]

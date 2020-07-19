@@ -125,10 +125,6 @@ AUDIO_FEATURE_ENABLED_FM_POWER_OPT := true
 BOARD_HAVE_QCOM_FM := true
 TARGET_QCOM_NO_FM_FIRMWARE := true
 
-# Init
-TARGET_INIT_VENDOR_LIB := libinit_msm8916
-TARGET_RECOVERY_DEVICE_MODULES := libinit_msm8916
-
 # Kernel
 BOARD_KERNEL_BASE := 0x80000000
 BOARD_KERNEL_CMDLINE := console=null androidboot.hardware=qcom user_debug=23 msm_rtb.filter=0x3F ehci-hcd.park=3 androidboot.bootdevice=7824900.sdhci androidboot.selinux=permissive
@@ -174,8 +170,6 @@ MALLOC_SVELTE := true
 #TARGET_RIL_VARIANT := caf
 BOARD_PROVIDES_LIBRIL := true
 TARGET_NEEDS_NETD_DIRECT_CONNECT_RULE := true
-
-TARGET_SPECIFIC_HEADER_PATH += $(PLATFORM_PATH)/include
 
 TARGET_PROCESS_SDK_VERSION_OVERRIDE += \
     /vendor/bin/hw/rild=27 \

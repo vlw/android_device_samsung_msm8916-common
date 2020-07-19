@@ -33,21 +33,27 @@
 #define _REALLY_INCLUDE_SYS__SYSTEM_PROPERTIES_H_
 #include <sys/_system_properties.h>
 
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+#include <android-base/properties.h>
+
+#include "vendor_init.h"
+#include "property_service.h"
+
 #define SIMSLOT_FILE "/proc/simslot_count"
 #define SERIAL_NUMBER_FILE "/efs/FactoryApp/serial_no"
 #define BT_ADDR_FILE "/efs/bluetooth/bt_addr"
 
-#include <init_msm8916.h>
+#include "init_msm8916.h"
 
 using android::base::GetProperty;
 using android::base::ReadFileToString;
 using android::base::Trim;
 using android::init::property_set;
-
-__attribute__ ((weak))
-void init_target_properties()
-{
-}
 
 static void init_alarm_boot_properties()
 {
@@ -78,21 +84,26 @@ static void init_alarm_boot_properties()
     }
 }
 
-void property_override(char const prop[], char const value[])
-{
-    prop_info *pi;
+// copied from build/tools/releasetools/ota_from_target_files.py
+// but with "." at the end and empty entry
+std::vector<std::string> ro_product_props_default_source_order = {
+    "",
+    "product.",
+    "product_services.",
+    "odm.",
+    "vendor.",
+    "system.",
+};
 
-    pi = (prop_info*) __system_property_find(prop);
-    if (pi)
+void property_override(char const prop[], char const value[], bool add = true)
+{
+    auto pi = (prop_info *) __system_property_find(prop);
+
+    if (pi != nullptr) {
         __system_property_update(pi, value, strlen(value));
-    else
+    } else if (add) {
         __system_property_add(prop, strlen(prop), value, strlen(value));
-}
-
-void property_override_dual(char const system_prop[], char const vendor_prop[], char const value[])
-{
-    property_override(system_prop, value);
-    property_override(vendor_prop, value);
+    }
 }
 
 void set_cdma_properties(const char *operator_alpha, const char *operator_numeric, const char * network)
@@ -138,6 +149,14 @@ void set_wifi_properties()
 	property_set("ro.radio.noril", "1");
 }
 
+void set_ro_product_prop(char const prop[], char const value[])
+{
+    for (const auto &source : ro_product_props_default_source_order) {
+        auto prop_name = "ro.product." + source + prop;
+        property_override(prop_name.c_str(), value, false);
+    }
+}
+
 void set_fingerprint()
 {
 	std::string fingerprint = GetProperty("ro.build.fingerprint", "");
@@ -158,13 +177,18 @@ void set_fingerprint()
 		device.c_str(), device.c_str(), release_version.c_str(), build_id.c_str(),
 		incremental_version.c_str(), build_type.c_str(), build_tags.c_str());
 
-	property_override_dual("ro.build.fingerprint", "ro.boot.fingerprint", new_fingerprint);
+    set_ro_product_prop("fingerprint", new_fingerprint);
 }
 
 void set_target_properties(const char *device, const char *model)
 {
-	property_override_dual("ro.product.device", "ro.product.vendor.model", device);
-	property_override_dual("ro.product.model", "ro.product.vendor.device", model);
+    set_ro_product_prop("device", device);
+    set_ro_product_prop("model", model);
+    set_ro_product_prop("name", device);
+    
+    // Init a dummy BT MAC address, will be overwritten later
+    property_set("ro.boot.btmacaddr", "00:00:00:00:00:00");
+    init_alarm_boot_properties();
 
 	property_set("ro.ril.telephony.mqanelements", "6");
 
@@ -195,12 +219,4 @@ void set_target_properties(const char *device, const char *model)
         property_override("ro.boot.btmacaddr", bt_address.c_str());
 	}
 
-}
-
-void vendor_load_properties()
-{
-    // Init a dummy BT MAC address, will be overwritten later
-    property_set("ro.boot.btmacaddr", "00:00:00:00:00:00");
-    init_target_properties();
-    init_alarm_boot_properties();
 }
