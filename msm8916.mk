@@ -252,10 +252,6 @@ PRODUCT_PACKAGES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/_hals.conf:$(TARGET_COPY_OUT_VENDOR)/etc/sensors/_hals.conf
 
-# SU
-PRODUCT_PACKAGES += \
-    su
-
 # Shims
 PRODUCT_PACKAGES += \
     libshim_binder
