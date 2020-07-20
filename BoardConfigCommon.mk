@@ -25,8 +25,6 @@ TARGET_BOOTLOADER_BOARD_NAME := MSM8916
 
 TARGET_NO_BOOTLOADER := true
 
-WITH_SU := true
-
 # Architecture
 ifneq ($(FORCE_32_BIT),true)
 TARGET_ARCH := arm64
