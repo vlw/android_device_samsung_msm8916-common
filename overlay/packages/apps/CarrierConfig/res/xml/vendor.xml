@@ -20,7 +20,10 @@
 <carrier_config_list>
     <carrier_config>
         <boolean name="apn_expand_bool" value="true" />
+        <boolean name="world_phone_bool" value="true" />
         <boolean name="allow_adding_apns_bool" value="true" />
+        <boolean name="show_cdma_choices_bool" value="true" />
+        <boolean name="show_apn_setting_cdma_bool" value="true" />
     </carrier_config>
 
     <!-- Verizon hackery -->
