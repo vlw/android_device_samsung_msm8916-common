@@ -144,6 +144,9 @@ BOARD_KERNEL_SEPARATED_DT := true
 
 TARGET_KERNEL_SOURCE := kernel/samsung/msm8916
 
+# LMKD stats logging
+TARGET_LMKD_STATS_LOG := true
+
 # Manifest
 DEVICE_MANIFEST_FILE := $(PLATFORM_PATH)/manifest.xml
 DEVICE_MATRIX_FILE := $(PLATFORM_PATH)/compatibility_matrix.xml
