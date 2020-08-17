@@ -31,6 +31,12 @@
     <!-- Whether to allow process with media UID to access CameraServiceProxy -->
     <bool name="config_allowMediaUidForCameraServiceProxy">true</bool>
 
+    <!-- The RadioAccessFamilies supported by the device.
+         Empty is viewed as "all".  Only used on devices which
+         don't support RIL_REQUEST_GET_RADIO_CAPABILITY
+         format is UMTS|LTE|... -->
+    <string translatable="false" name="config_radio_access_family">GSM|GPRS|EDGE|UMTS|HSPA|HSPAP|LTE</string>
+
     <!-- When true, the tethering upstream network follows the current default
          Internet network (except when the current default network is mobile,
          in which case a DUN network will be used if required). -->
