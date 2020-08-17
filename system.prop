@@ -92,6 +92,8 @@ ro.ril.transmitpower=true
 persist.radio.no_wait_for_card=1
 persist.radio.use_se_table_only=1
 keyguard.no_require_sim=true
+ro.ril.telephony.qan_resp_strings=6
+ro.telephony.mms_data_profile=5
 
 # Wi-Fi
 wifi.interface=wlan0
