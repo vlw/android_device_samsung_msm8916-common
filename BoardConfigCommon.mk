@@ -89,6 +89,9 @@ ifeq ($(HOST_OS),linux)
     WITH_DEXPREOPT := true
 endif
 
+# DexPreopt debug info
+WITH_DEXPREOPT_DEBUG_INFO := false
+
 # Display
 MAX_EGL_CACHE_KEY_SIZE := 12*1024
 MAX_EGL_CACHE_SIZE := 2048*1024
