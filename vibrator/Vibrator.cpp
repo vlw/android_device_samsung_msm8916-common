@@ -91,10 +91,10 @@ Return<void> Vibrator::perform(Effect effect, EffectStrength strength, perform_c
         uint8_t amplitude;
         switch (strength) {
         case EffectStrength::LIGHT:
-            amplitude = 194;
+            amplitude = 100;
             break;
         case EffectStrength::MEDIUM:
-            amplitude = 208;
+            amplitude = 170;
             break;
         case EffectStrength::STRONG:
             amplitude = 255;
