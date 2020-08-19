@@ -19,6 +19,7 @@ persist.vendor.audio.fluence.speaker=true
 persist.vendor.audio.fluence.voicecall=true
 persist.vendor.audio.fluence.voicerec=false
 ro.vendor.audio.sdk.fluencetype=fluence
+persist.vendor.audio.fluence.mode=endfire
 
 ro.config.media_vol_steps=25
 ro.config.vc_call_vol_steps=7
@@ -88,6 +89,7 @@ DEVICE_PROVISIONED=1
 rild.libpath=/vendor/lib/libsec-ril.so
 rild.libpath2=/vendor/lib/libsec-ril-dsds.so
 ro.multisim.set_audio_params=true
+ro.multisim.audio_follow_default_sim=false
 #persist.radio.sib16_support=1
 ro.config.always_show_roaming=true
 persist.radio.rat_on=combine
