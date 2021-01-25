@@ -154,20 +154,6 @@
          rmem_min,rmem_def,rmem_max,wmem_min,wmem_def,wmem_max -->
     <string name="config_wifi_tcp_buffers" translatable="false">524288,2097152,4194304,262144,524288,1048576</string>
 
-    <!-- Should the pinner service pin the Camera application? -->
-    <bool name="config_pinnerCameraApp">true</bool>
-
-    <!-- Should the pinner service pin the Home application? -->
-    <bool name="config_pinnerHomeApp">true</bool>
-
-    <!-- Default list of files pinned by the Pinner Service -->
-    <string-array translatable="false" name="config_defaultPinnerServiceFiles">
-        <item>"/system/priv-app/SystemUI/SystemUI.apk"</item>
-        <item>"/data/dalvik-cache/arm/system@priv-app@SystemUI@SystemUI.apk@classes.dex"</item>
-        <item>"/data/dalvik-cache/arm/system@priv-app@SystemUI@SystemUI.apk@classes.vdex"</item>
-        <item>"/system/lib/libsurfaceflinger.so"</item>
-    </string-array>
-
     <!-- Ambient display. -->
     <integer name="config_screenBrightnessDoze">10</integer>
     <string name="config_dozeComponent">com.android.systemui/com.android.systemui.doze.DozeService</string>
