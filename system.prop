@@ -89,7 +89,6 @@ DEVICE_PROVISIONED=1
 rild.libpath=/vendor/lib/libsec-ril.so
 rild.libpath2=/vendor/lib/libsec-ril-dsds.so
 ro.multisim.set_audio_params=true
-ro.multisim.audio_follow_default_sim=false
 #persist.radio.sib16_support=1
 ro.config.always_show_roaming=true
 persist.radio.rat_on=combine
