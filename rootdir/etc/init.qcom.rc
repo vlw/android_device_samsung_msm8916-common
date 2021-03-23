@@ -148,17 +148,6 @@ on boot
     write /proc/sys/net/ipv6/conf/rmnet6/accept_ra 2
     write /proc/sys/net/ipv6/conf/rmnet7/accept_ra 2
 
-    # Touch Disabler permissions
-    chown system system /sys/class/touch_key
-    chown system system /sys/class/touch_key/control
-    chown system system /sys/class/touch_key/enabled
-    chown system system /sys/class/touch_key/status
-
-    chown system system /sys/class/touch_screen
-    chown system system /sys/class/touch_screen/control
-    chown system system /sys/class/touch_screen/enabled
-    chown system system /sys/class/touch_screen/status
-
     # To prevent out of order acknowledgements from making
     # connection tracking to treat them as not belonging to
     # the connection they belong to.
@@ -286,14 +275,6 @@ service qcamerasvr /system/vendor/bin/mm-qcamera-daemon
 
 on property:sys.boot_completed=1
     restart cameraserver
-
-    # Enable Touch Devices
-    write /sys/class/touch_key/control manual
-    write /sys/class/touch_key/enabled true
-    write /sys/class/touch_key/control auto
-    write /sys/class/touch_screen/control manual
-    write /sys/class/touch_screen/enabled true
-    write /sys/class/touch_screen/control auto
 
 service qseecomd /system/vendor/bin/qseecomd
     class core
