@@ -180,11 +180,11 @@ void set_fingerprint()
     set_ro_product_prop("fingerprint", new_fingerprint);
 }
 
-void set_target_properties(const char *device, const char *model)
+void set_target_properties(const char *device, const char *model, const char *name)
 {
     set_ro_product_prop("device", device);
     set_ro_product_prop("model", model);
-    set_ro_product_prop("name", device);
+    set_ro_product_prop("name", name);
     
     // Init a dummy BT MAC address, will be overwritten later
     property_set("ro.boot.btmacaddr", "00:00:00:00:00:00");
