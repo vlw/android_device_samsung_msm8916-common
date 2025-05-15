@@ -171,4 +171,6 @@
     <!-- BurnIn. -->
     <bool name="config_enableBurnInProtection">true</bool>
 
+     <!-- AOSP WFD -->
+    <bool name="config_enableWifiDisplay">true</bool>
 </resources>
