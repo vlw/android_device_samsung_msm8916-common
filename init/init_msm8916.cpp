@@ -53,7 +53,6 @@
 using android::base::GetProperty;
 using android::base::ReadFileToString;
 using android::base::Trim;
-using android::init::property_set;
 
 static void init_alarm_boot_properties()
 {
@@ -78,9 +77,9 @@ static void init_alarm_boot_properties()
          * 8 -> KPDPWR_N pin toggled (power key pressed)
          */
         if (Trim(boot_reason) == "3" || tmp == "true")
-            property_set("ro.alarm_boot", "true");
+            property_override("ro.alarm_boot", "true");
         else
-            property_set("ro.alarm_boot", "false");
+            property_override("ro.alarm_boot", "false");
     }
 }
 
@@ -109,44 +108,44 @@ void property_override(char const prop[], char const value[], bool add = true)
 void set_cdma_properties(const char *operator_alpha, const char *operator_numeric, const char * network)
 {
 	/* Dynamic CDMA Properties */
-	property_set("ro.cdma.home.operator.alpha", operator_alpha);
-	property_set("ro.cdma.home.operator.numeric", operator_numeric);
-	property_set("ro.telephony.default_network", network);
+	property_override("ro.cdma.home.operator.alpha", operator_alpha);
+	property_override("ro.cdma.home.operator.numeric", operator_numeric);
+	property_override("ro.telephony.default_network", network);
 
 	/* Static CDMA Properties */
-	property_set("ril.subscription.types", "NV,RUIM");
-	property_set("ro.telephony.default_cdma_sub", "0");
-	property_set("ro.telephony.get_imsi_from_sim", "true");
-	property_set("ro.telephony.ril.config", "newDriverCallU,newDialCode");
-	property_set("telephony.lteOnCdmaDevice", "1");
+	property_override("ril.subscription.types", "NV,RUIM");
+	property_override("ro.telephony.default_cdma_sub", "0");
+	property_override("ro.telephony.get_imsi_from_sim", "true");
+	property_override("ro.telephony.ril.config", "newDriverCallU,newDialCode");
+	property_override("telephony.lteOnCdmaDevice", "1");
 }
 
 void set_dsds_properties()
 {
-	property_set("ro.multisim.simslotcount", "2");
-	property_set("ro.telephony.ril.config", "simactivation");
-	property_set("persist.radio.multisim.config", "dsds");
+	property_override("ro.multisim.simslotcount", "2");
+	property_override("ro.telephony.ril.config", "simactivation");
+	property_override("persist.radio.multisim.config", "dsds");
 }
 
 void set_gsm_properties()
 {
-	property_set("telephony.lteOnCdmaDevice", "0");
-    property_set("telephony.lteOnGsmDevice", "0");
-	property_set("ro.telephony.default_network", "9");
+	property_override("telephony.lteOnCdmaDevice", "0");
+    property_override("telephony.lteOnGsmDevice", "0");
+	property_override("ro.telephony.default_network", "9");
 }
 
 void set_lte_properties()
 {
-	property_set("persist.radio.lte_vrte_ltd", "1");
-	property_set("telephony.lteOnCdmaDevice", "0");
-	property_set("telephony.lteOnGsmDevice", "1");
-	property_set("ro.telephony.default_network", "10");
+	property_override("persist.radio.lte_vrte_ltd", "1");
+	property_override("telephony.lteOnCdmaDevice", "0");
+	property_override("telephony.lteOnGsmDevice", "1");
+	property_override("ro.telephony.default_network", "10");
 }
 
 void set_wifi_properties()
 {
-	property_set("ro.carrier", "wifi-only");
-	property_set("ro.radio.noril", "1");
+	property_override("ro.carrier", "wifi-only");
+	property_override("ro.radio.noril", "1");
 }
 
 void set_ro_product_prop(char const prop[], char const value[])
@@ -187,10 +186,10 @@ void set_target_properties(const char *device, const char *model, const char *na
     set_ro_product_prop("name", name);
     
     // Init a dummy BT MAC address, will be overwritten later
-    property_set("ro.boot.btmacaddr", "00:00:00:00:00:00");
+    property_override("ro.boot.btmacaddr", "00:00:00:00:00:00");
     init_alarm_boot_properties();
 
-	property_set("ro.ril.telephony.mqanelements", "6");
+	property_override("ro.ril.telephony.mqanelements", "6");
 
 	/* check and/or set fingerprint */
 	set_fingerprint();
