@@ -54,6 +54,17 @@ using android::base::GetProperty;
 using android::base::ReadFileToString;
 using android::base::Trim;
 
+void property_override(char const prop[], char const value[], bool add = true)
+{
+    auto pi = (prop_info *) __system_property_find(prop);
+
+    if (pi != nullptr) {
+        __system_property_update(pi, value, strlen(value));
+    } else if (add) {
+        __system_property_add(prop, strlen(prop), value, strlen(value));
+    }
+}
+
 static void init_alarm_boot_properties()
 {
     char const *boot_reason_file = "/proc/sys/kernel/boot_reason";
@@ -94,17 +105,6 @@ std::vector<std::string> ro_product_props_default_source_order = {
     "system_ext.",
     "vendor.",
 };
-
-void property_override(char const prop[], char const value[], bool add = true)
-{
-    auto pi = (prop_info *) __system_property_find(prop);
-
-    if (pi != nullptr) {
-        __system_property_update(pi, value, strlen(value));
-    } else if (add) {
-        __system_property_add(prop, strlen(prop), value, strlen(value));
-    }
-}
 
 void set_cdma_properties(const char *operator_alpha, const char *operator_numeric, const char * network)
 {
