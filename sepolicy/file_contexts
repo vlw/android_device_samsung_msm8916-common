@@ -74,3 +74,5 @@
 
 # sysfs - cpu/perf
 /sys/devices/system/soc/soc0(/.*)?                      u:object_r:sysfs_socinfo:s0
+
+/(vendor|system/vendor)/bin/hw/android\.hardware\.gatekeeper@1\.0-service\.software       u:object_r:hal_gatekeeper_default_exec:s0
