@@ -47,10 +47,6 @@ PRODUCT_PACKAGES += \
     tinycap \
     libtinycompress
 
-# fastbootd
-PRODUCT_PACKAGES += \
-    fastbootd
-
 PRODUCT_PACKAGES += \
     audio.primary.msm8916 \
     libqcompostprocbundle \
