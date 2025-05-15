@@ -83,6 +83,7 @@ TARGET_BOOTANIMATION_HALF_RES := true
 
 # Camera
 TARGET_HAS_LEGACY_CAMERA_HAL1 := true
+MALLOC_SVELTE_FOR_LIBC32 := true
 TARGET_PROCESS_SDK_VERSION_OVERRIDE := \
     /system/vendor/bin/mm-qcamera-daemon=22 \
     /system/bin/mediaserver=22
