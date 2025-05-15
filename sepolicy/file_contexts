@@ -22,6 +22,10 @@
 /sys/devices/virtual/input(/.*)?                        u:object_r:sysfs_input:s0
 /sys/devices/virtual/camera(/.*)?                       u:object_r:sysfs_camera:s0
 
+# sysfs - time
+/sys/devices/qpnp-rtc-[0-9]+/rtc/rtc0(/.*)?             u:object_r:sysfs_rtc:s0
+/(system/vendor|vendor)/bin/timekeep                    u:object_r:timekeep_exec:s0
+
 # device nodes
 /dev/alarm                                              u:object_r:alarm_device:s0
 /dev/rfkill                                             u:object_r:wlan_device:s0
