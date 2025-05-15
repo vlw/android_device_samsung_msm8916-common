@@ -155,6 +155,9 @@ TARGET_KERNEL_SOURCE := kernel/samsung/msm8916
 DEVICE_MANIFEST_FILE := $(PLATFORM_PATH)/manifest.xml
 DEVICE_MATRIX_FILE := $(PLATFORM_PATH)/compatibility_matrix.xml
 
+# Legacy memfd
+TARGET_HAS_MEMFD_BACKPORT := true
+
 # Media
 TARGET_USES_MEDIA_EXTENSIONS := true
 
