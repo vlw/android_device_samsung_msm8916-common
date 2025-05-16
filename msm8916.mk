@@ -270,6 +270,10 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PACKAGES += \
     libshim_binder
 
+# Soong
+PRODUCT_SOONG_NAMESPACES += \
+    device/samsung/msm8916-common
+
 # TimeKeep
 PRODUCT_PACKAGES += \
     timekeep \
