@@ -208,6 +208,8 @@
 /dev/battery_data         0660   system     system
 
 # vibrator
+/sys/devices/virtual/timed_output/vibrator   enable          0660    system    system
+/sys/devices/virtual/timed_output/vibrator   intensity       0660    system    system
 /sys/devices/virtual/timed_output/vibrator   pwm_default     0660    system    system
 /sys/devices/virtual/timed_output/vibrator   pwm_min         0660    system    system
 /sys/devices/virtual/timed_output/vibrator   pwm_max         0660    system    system
