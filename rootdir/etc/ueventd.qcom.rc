@@ -222,6 +222,9 @@
 /dev/nfc-nci              0660    nfc         nfc
 /dev/assd                 0660    nfc         nfc
 
+# hw key
+/sys/devices/virtual/sec/sec_touchkey keypad_enable 0660 system system
+
 # UIO devices
 /dev/uio0                 0660   system     system
 /dev/uio1                 0660   system     system
