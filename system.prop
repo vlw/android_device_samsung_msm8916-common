@@ -99,5 +99,8 @@ keyguard.no_require_sim=true
 ro.ril.telephony.qan_resp_strings=6
 ro.telephony.mms_data_profile=5
 
+# Recovery
+persist.vendor.recovery_update=false
+
 # Wi-Fi
 wifi.interface=wlan0
