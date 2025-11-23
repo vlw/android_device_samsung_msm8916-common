@@ -102,5 +102,8 @@ ro.telephony.mms_data_profile=5
 # Recovery
 persist.vendor.recovery_update=false
 
+# Charger
+ro.charger.enable_suspend=true
+
 # Wi-Fi
 wifi.interface=wlan0
