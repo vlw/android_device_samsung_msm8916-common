@@ -110,6 +110,10 @@ persist.vendor.recovery_update=false
 # (b/183612348): Enable skia reduceOpsTaskSplitting
 renderthread.skia.reduceopstasksplitting=true
 
+# SoC
+ro.soc.manufacturer=Qualcomm
+ro.soc.model=MSM8916
+
 # Charger
 ro.charger.enable_suspend=true
 
