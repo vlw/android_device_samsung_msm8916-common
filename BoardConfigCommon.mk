@@ -149,6 +149,7 @@ BOARD_KERNEL_SEPARATED_DT := true
 TARGET_KERNEL_CLANG_COMPILE := false
 TARGET_KERNEL_SOURCE := kernel/samsung/msm8916
 TARGET_KERNEL_ADDITIONAL_FLAGS := HOSTCFLAGS="-fuse-ld=lld -Wno-unused-command-line-argument"
+BOARD_RAMDISK_USE_XZ := true
 
 # Manifest
 DEVICE_MANIFEST_FILE := $(PLATFORM_PATH)/manifest.xml
