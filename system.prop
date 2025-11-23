@@ -33,6 +33,9 @@ ro.bluetooth.sap=true
 ro.qualcomm.bt.hci_transport=smd
 ro.bt.bdaddr_path=/efs/bluetooth/bt_addr
 
+# BPF
+ro.kernel.ebpf.supported=false
+
 # Display
 debug.hwui.use_buffer_age=false
 debug.sf.disable_backpressure=1
