@@ -1,4 +1,5 @@
 type alarm_device, dev_type, mlstrustedobject;
+type mediadrm_vendor_data_file,  file_type, data_file_type;
 type proc_kernel_sched, fs_type;
 type sysfs_mdnie, fs_type, sysfs_type;
 type sysfs_iio, fs_type, sysfs_type;
