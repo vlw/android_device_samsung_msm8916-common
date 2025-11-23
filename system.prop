@@ -52,6 +52,7 @@ debug.mdpcomp.idletime=600
 persist.hwc.mdpcomp.enable=true
 persist.hwc.ptor.enable=true
 debug.enable.sglscale=1
+persist.log.tag.OpenGLRenderer=S
 
 # Data services
 persist.data.netmgrd.qos.enable=false
