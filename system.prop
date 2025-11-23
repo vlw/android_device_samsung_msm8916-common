@@ -121,6 +121,9 @@ renderthread.skia.reduceopstasksplitting=true
 ro.soc.manufacturer=Qualcomm
 ro.soc.model=MSM8916
 
+# System
+ro.vndk.version=current
+
 # Charger
 ro.charger.enable_suspend=true
 
