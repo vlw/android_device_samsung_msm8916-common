@@ -1,0 +1,71 @@
+selinux_check_context(init)
+binder_call(init, servicemanager)
+
+allow init {
+    sysfs_iio
+    sysfs_sec_tsp
+    sysfs_sensors
+}:lnk_file read;
+
+allow init {
+    sysfs_audio
+    sysfs_batteryinfo
+    sysfs_bluetooth_writable
+    sysfs_camera
+    sysfs_graphics
+    sysfs_iio
+    sysfs_input
+    sysfs_kgsl
+    sysfs_leds
+    sysfs_mdnie
+    sysfs_msmuart_file
+    sysfs_sec_bamdmux
+    sysfs_sec_barcode_emul
+    sysfs_sec_epen
+    sysfs_sec_ir
+    sysfs_sec_key
+    sysfs_sec_led
+    sysfs_sec_switch
+    sysfs_sec_thermistor
+    sysfs_sec_touchkey
+    sysfs_sec_tsp
+    sysfs_sensors
+    sysfs_socinfo
+    sysfs_usb_otg
+}:file setattr;
+
+allow init {
+    sysfs_cpu_boost
+    sysfs_devices_system_cpu
+    sysfs_lowmemorykiller
+    sysfs_mmc_host
+    sysfs_msm_perf
+    sysfs_msm_power
+    sysfs_sec_key
+    sysfs_thermal
+}:file w_file_perms;
+
+allow init {
+    privapp_data_file
+    system_app_data_file
+    app_data_file
+}:dir { getattr setattr };
+
+allow init init:capability2 { block_suspend };
+allow init efs_file:dir mounton;
+allow init proc_last_kmsg:file { r_file_perms setattr };
+allow init sysfs_fingerprint:file setattr;
+allow init sysfs_sec_led:file { open rw_file_perms };
+allow init sysfs_graphics:file { open rw_file_perms };
+allow init sysfs:file w_file_perms;
+allow init proc:file rw_file_perms;
+allow init system_file:dir { relabelfrom };
+allow init system_file:file { relabelfrom };
+allow init vendor_file:file { execute_no_trans };
+allow init hal_light_service:service_manager { add };
+allow init seapp_contexts_file:file r_file_perms;
+allow init shell_data_file:dir { relabelfrom };
+allow init adb_data_file:dir search;
+allow init kernel:security { check_context };
+
+allow init proc_sec_simslot:file r_file_perms;

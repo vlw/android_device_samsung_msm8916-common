@@ -1,0 +1,10 @@
+allow mm-qcamerad camera_data_file:dir r_dir_perms;
+allow mm-qcamerad mpctl_socket:dir search;
+unix_socket_connect(mm-qcamerad, mpctl, perfd)
+
+get_prop(mm-qcamerad, default_prop)
+type_transition mm-qcamerad system_data_root_file:sock_file camera_socket "cam_socket3";
+
+allow mm-qcamerad sysfs_camera:dir search;
+allow mm-qcamerad sysfs_camera:file rw_file_perms;
+allow mm-qcamerad vendor_file:file execmod;
