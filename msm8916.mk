@@ -176,11 +176,6 @@ PRODUCT_PACKAGES += \
 PRODUCT_ENFORCE_VINTF_MANIFEST_OVERRIDE := true
 
 # Keymaster
-ifneq ($(TARGET_PROVIDES_KEYMASTER),true)
-PRODUCT_PACKAGES += \
-    keystore.msm8916
-endif
-
 PRODUCT_PACKAGES += \
     android.hardware.keymaster@4.1-service
 
