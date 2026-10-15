@@ -118,6 +118,8 @@ void convertRilDataCallToHal(RIL_Data_Call_Response_v11 *dcResponse,
 void convertRilDataCallListToHal(void *response, size_t responseLen,
         hidl_vec<SetupDataCallResult>& dcResultList);
 
+static size_t getRilCellInfoSize();
+
 void convertRilCellInfoListToHal(void *response, size_t responseLen, hidl_vec<CellInfo>& records);
 
 struct RadioImpl : public V1_1::IRadio {
@@ -5869,7 +5871,7 @@ int radio::getCellInfoListResponse(int slotId,
 
         hidl_vec<CellInfo> ret;
         if ((response == NULL && responseLen != 0)
-                || responseLen % sizeof(RIL_CellInfo_v12) != 0) {
+                || responseLen % getRilCellInfoSize() != 0) {
             RLOGE("getCellInfoListResponse: Invalid response");
             if (e == RIL_E_SUCCESS) responseInfo.error = RadioError::INVALID_RESPONSE;
         } else {
@@ -7961,9 +7963,109 @@ int radio::voiceRadioTechChangedInd(int slotId,
     return 0;
 }
 
+/**
+ * Vendor RILs older than v12 report RIL_CellInfo, which lacks arfcn/bsic/timingAdvance for GSM,
+ * uarfcn for WCDMA and earfcn for LTE. Reading it as RIL_CellInfo_v12 shifts every following
+ * field (e.g. LTE signalStrength ends up as earfcn).
+ */
+static size_t getRilCellInfoSize() {
+    return s_vendorFunctions->version < 12 ? sizeof(RIL_CellInfo) : sizeof(RIL_CellInfo_v12);
+}
+
+/**
+ * Legacy RILs report MNC as a plain integer without the digit count, so "01" arrives as 1 and
+ * would be decoded as "1", which the framework rejects. Assume two digits for values below 100.
+ */
+static int encodeLegacyMnc(int mnc) {
+    if (mnc < 0 || mnc >= 100) return mnc;
+    return (2 << (sizeof(int) * 8 - 4)) | mnc;
+}
+
+/**
+ * The legacy Samsung RIL reports LTE rsrp/rsrq in cell info as negative tenths
+ * (e.g. -942 for -94.2 dBm), while the HAL expects positive whole units (94).
+ */
+static int convertLegacyTenthsToPositive(int value) {
+    if (value == INT_MAX || value >= 0) return value;
+    return (-value + 5) / 10;
+}
+
+static void convertLegacyRilCellInfo(const RIL_CellInfo &in, RIL_CellInfo_v12 &out) {
+    memset(&out, 0, sizeof(out));
+    out.cellInfoType = in.cellInfoType;
+    out.registered = in.registered;
+    out.timeStampType = in.timeStampType;
+    out.timeStamp = in.timeStamp;
+
+    switch (in.cellInfoType) {
+        case RIL_CELL_INFO_TYPE_GSM: {
+            const RIL_CellInfoGsm &gsm = in.CellInfo.gsm;
+            out.CellInfo.gsm.cellIdentityGsm.mcc = gsm.cellIdentityGsm.mcc;
+            out.CellInfo.gsm.cellIdentityGsm.mnc = encodeLegacyMnc(gsm.cellIdentityGsm.mnc);
+            out.CellInfo.gsm.cellIdentityGsm.lac = gsm.cellIdentityGsm.lac;
+            out.CellInfo.gsm.cellIdentityGsm.cid = gsm.cellIdentityGsm.cid;
+            out.CellInfo.gsm.cellIdentityGsm.arfcn = INT_MAX;
+            out.CellInfo.gsm.cellIdentityGsm.bsic = 0xFF;
+            out.CellInfo.gsm.signalStrengthGsm.signalStrength =
+                    gsm.signalStrengthGsm.signalStrength;
+            out.CellInfo.gsm.signalStrengthGsm.bitErrorRate = gsm.signalStrengthGsm.bitErrorRate;
+            out.CellInfo.gsm.signalStrengthGsm.timingAdvance = INT_MAX;
+            break;
+        }
+
+        case RIL_CELL_INFO_TYPE_WCDMA: {
+            const RIL_CellInfoWcdma &wcdma = in.CellInfo.wcdma;
+            out.CellInfo.wcdma.cellIdentityWcdma.mcc = wcdma.cellIdentityWcdma.mcc;
+            out.CellInfo.wcdma.cellIdentityWcdma.mnc = encodeLegacyMnc(wcdma.cellIdentityWcdma.mnc);
+            out.CellInfo.wcdma.cellIdentityWcdma.lac = wcdma.cellIdentityWcdma.lac;
+            out.CellInfo.wcdma.cellIdentityWcdma.cid = wcdma.cellIdentityWcdma.cid;
+            out.CellInfo.wcdma.cellIdentityWcdma.psc = wcdma.cellIdentityWcdma.psc;
+            out.CellInfo.wcdma.cellIdentityWcdma.uarfcn = INT_MAX;
+            out.CellInfo.wcdma.signalStrengthWcdma = wcdma.signalStrengthWcdma;
+            break;
+        }
+
+        case RIL_CELL_INFO_TYPE_CDMA:
+            out.CellInfo.cdma = in.CellInfo.cdma;
+            break;
+
+        case RIL_CELL_INFO_TYPE_LTE: {
+            const RIL_CellInfoLte &lte = in.CellInfo.lte;
+            out.CellInfo.lte.cellIdentityLte.mcc = lte.cellIdentityLte.mcc;
+            out.CellInfo.lte.cellIdentityLte.mnc = encodeLegacyMnc(lte.cellIdentityLte.mnc);
+            out.CellInfo.lte.cellIdentityLte.ci = lte.cellIdentityLte.ci;
+            out.CellInfo.lte.cellIdentityLte.pci = lte.cellIdentityLte.pci;
+            out.CellInfo.lte.cellIdentityLte.tac = lte.cellIdentityLte.tac;
+            out.CellInfo.lte.cellIdentityLte.earfcn = INT_MAX;
+            out.CellInfo.lte.signalStrengthLte = lte.signalStrengthLte;
+            out.CellInfo.lte.signalStrengthLte.rsrp =
+                    convertLegacyTenthsToPositive(lte.signalStrengthLte.rsrp);
+            out.CellInfo.lte.signalStrengthLte.rsrq =
+                    convertLegacyTenthsToPositive(lte.signalStrengthLte.rsrq);
+            break;
+        }
+
+        case RIL_CELL_INFO_TYPE_TD_SCDMA:
+            out.CellInfo.tdscdma = in.CellInfo.tdscdma;
+            break;
+
+        default:
+            break;
+    }
+}
+
 void convertRilCellInfoListToHal(void *response, size_t responseLen, hidl_vec<CellInfo>& records) {
-    int num = responseLen / sizeof(RIL_CellInfo_v12);
+    int num = responseLen / getRilCellInfoSize();
     records.resize(num);
+
+    std::vector<RIL_CellInfo_v12> legacyCellInfo;
+    if (s_vendorFunctions->version < 12) {
+        legacyCellInfo.resize(num);
+        for (int i = 0; i < num; i++) {
+            convertLegacyRilCellInfo(((RIL_CellInfo *) response)[i], legacyCellInfo[i]);
+        }
+        response = legacyCellInfo.data();
+    }
 
     RIL_CellInfo_v12 *rillCellInfo = (RIL_CellInfo_v12 *) response;
     for (int i = 0; i < num; i++) {
@@ -8112,7 +8214,7 @@ int radio::cellInfoListInd(int slotId,
                            int indicationType, int token, RIL_Errno e, void *response,
                            size_t responseLen) {
     if (radioService[slotId] != NULL && radioService[slotId]->mRadioIndication != NULL) {
-        if ((response == NULL && responseLen != 0) || responseLen % sizeof(RIL_CellInfo_v12) != 0) {
+        if ((response == NULL && responseLen != 0) || responseLen % getRilCellInfoSize() != 0) {
             RLOGE("cellInfoListInd: invalid response");
             return 0;
         }
