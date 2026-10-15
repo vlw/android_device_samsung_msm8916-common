@@ -217,8 +217,9 @@ on property:hw.fm.init=1
 # QMUX must be in multiple groups to support external process connections
 service qmuxd /vendor/bin/qmuxd
     class main
-    user root
+    user radio
     group radio audio bluetooth gps oem_2950 wakelock log
+    capabilities BLOCK_SUSPEND
     writepid /dev/cpuset/system-background/tasks
 
 service msm_irqbalance /vendor/bin/msm_irqbalance -f /vendor/etc/msm_irqbalance.conf
