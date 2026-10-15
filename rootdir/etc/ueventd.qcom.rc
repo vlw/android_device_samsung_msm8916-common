@@ -25,6 +25,9 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+# Relabel /sys in parallel during coldboot, single-threaded it takes ~19s instead of ~11s
+parallel_restorecon enabled
+
 # the DIAG device node is not world writable/readable.
 /dev/diag                 0660   system     oem_2950
 
