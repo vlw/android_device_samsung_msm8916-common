@@ -121,6 +121,10 @@ on early-boot
     write /sys/kernel/boot_adsp/boot 1
 
 on boot
+    # Kernel 3.10 has no uclamp, so the cpu cgroups only prioritize through
+    # shares: keep background tasks from competing with the foreground
+    write /dev/cpuctl/background/cpu.shares 52
+
     # Report the display idle 100ms after the last frame, the power HAL
     # waits for it (fb0/idle_state) to end interaction boosts
     write /sys/class/graphics/fb0/idle_time 100
