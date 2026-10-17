@@ -39,6 +39,7 @@
 /efs/wifi(/.*)?                                         u:object_r:wifi_efs_file:s0
 
 # executeables
+/(vendor|system/vendor)/bin/hw/android\.hardware\.power-service\.samsung-libperfmgr  u:object_r:hal_power_default_exec:s0
 /system/vendor/bin/macloader                            u:object_r:macloader_exec:s0
 /(vendor|system/vendor)/bin/hw/android\.hardware\.drm@1\.4-service\.clearkey              u:object_r:hal_drm_clearkey_exec:s0
 /(vendor|system/vendor)/bin/hw/android\.hardware\.gatekeeper@1\.0-service\.software       u:object_r:hal_gatekeeper_default_exec:s0

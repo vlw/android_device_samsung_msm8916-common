@@ -1,0 +1,156 @@
+{
+    "Nodes": [
+        {
+            "Name": "CPUMinFreq",
+            "Path": "/sys/module/msm_performance/parameters/cpu_min_freq",
+            "Values": [
+                "0:1209600 1:1209600 2:1209600 3:1209600",
+                "0:1094400 1:1094400 2:1094400 3:1094400",
+                "0:998400 1:998400 2:998400 3:998400",
+                "0:0 1:0 2:0 3:0"
+            ],
+            "DefaultIndex": 3,
+            "ResetOnInit": true
+        },
+        {
+            "Name": "CPUMaxFreq",
+            "Path": "/sys/module/msm_performance/parameters/cpu_max_freq",
+            "Values": [
+                "0:4294967295 1:4294967295 2:4294967295 3:4294967295",
+                "0:998400 1:998400 2:998400 3:998400"
+            ],
+            "DefaultIndex": 0,
+            "ResetOnInit": true
+        },
+        {
+            "Name": "CoreCtlMinCpus",
+            "Path": "/sys/devices/system/cpu/cpu0/core_ctl/min_cpus",
+            "Values": [
+                "4",
+                "2",
+                "0"
+            ],
+            "DefaultIndex": 2,
+            "ResetOnInit": true
+        },
+        {
+            "Name": "GPUMinFreq",
+            "Path": "/sys/class/kgsl/kgsl-3d0/devfreq/min_freq",
+            "Values": [
+                "400000000",
+                "310000000",
+                "200000000"
+            ],
+            "DefaultIndex": 2,
+            "ResetOnInit": true
+        },
+        {
+            "Name": "GPUMaxFreq",
+            "Path": "/sys/class/kgsl/kgsl-3d0/devfreq/max_freq",
+            "Values": [
+                "400000000",
+                "310000000"
+            ],
+            "DefaultIndex": 0,
+            "ResetOnInit": true
+        }
+    ],
+    "Actions": [
+        {
+            "PowerHint": "INTERACTION",
+            "Node": "CPUMinFreq",
+            "Duration": 0,
+            "Value": "0:998400 1:998400 2:998400 3:998400"
+        },
+        {
+            "PowerHint": "INTERACTION",
+            "Node": "CoreCtlMinCpus",
+            "Duration": 0,
+            "Value": "2"
+        },
+        {
+            "PowerHint": "LAUNCH",
+            "Node": "CPUMinFreq",
+            "Duration": 5000,
+            "Value": "0:1209600 1:1209600 2:1209600 3:1209600"
+        },
+        {
+            "PowerHint": "LAUNCH",
+            "Node": "CoreCtlMinCpus",
+            "Duration": 5000,
+            "Value": "4"
+        },
+        {
+            "PowerHint": "LAUNCH",
+            "Node": "GPUMinFreq",
+            "Duration": 5000,
+            "Value": "310000000"
+        },
+        {
+            "PowerHint": "AUDIO_LAUNCH",
+            "Node": "CPUMinFreq",
+            "Duration": 0,
+            "Value": "0:1094400 1:1094400 2:1094400 3:1094400"
+        },
+        {
+            "PowerHint": "AUDIO_LAUNCH",
+            "Node": "CoreCtlMinCpus",
+            "Duration": 0,
+            "Value": "2"
+        },
+        {
+            "PowerHint": "CAMERA_LAUNCH",
+            "Node": "CPUMinFreq",
+            "Duration": 0,
+            "Value": "0:1209600 1:1209600 2:1209600 3:1209600"
+        },
+        {
+            "PowerHint": "CAMERA_LAUNCH",
+            "Node": "CoreCtlMinCpus",
+            "Duration": 0,
+            "Value": "4"
+        },
+        {
+            "PowerHint": "CAMERA_SHOT",
+            "Node": "CPUMinFreq",
+            "Duration": 0,
+            "Value": "0:1209600 1:1209600 2:1209600 3:1209600"
+        },
+        {
+            "PowerHint": "CAMERA_SHOT",
+            "Node": "CoreCtlMinCpus",
+            "Duration": 0,
+            "Value": "4"
+        },
+        {
+            "PowerHint": "EXPENSIVE_RENDERING",
+            "Node": "GPUMinFreq",
+            "Duration": 0,
+            "Value": "310000000"
+        },
+        {
+            "PowerHint": "SUSTAINED_PERFORMANCE",
+            "Node": "CPUMaxFreq",
+            "Duration": 0,
+            "Value": "0:998400 1:998400 2:998400 3:998400"
+        },
+        {
+            "PowerHint": "SUSTAINED_PERFORMANCE",
+            "Node": "GPUMaxFreq",
+            "Duration": 0,
+            "Value": "310000000"
+        },
+        {
+            "PowerHint": "LOW_POWER",
+            "Node": "CPUMaxFreq",
+            "Duration": 0,
+            "Value": "0:998400 1:998400 2:998400 3:998400"
+        },
+        {
+            "PowerHint": "LOW_POWER",
+            "Node": "GPUMaxFreq",
+            "Duration": 0,
+            "Value": "310000000"
+        }
+    ]
+}

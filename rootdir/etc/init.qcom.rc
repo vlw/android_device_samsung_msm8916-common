@@ -121,6 +121,10 @@ on early-boot
     write /sys/kernel/boot_adsp/boot 1
 
 on boot
+    # Report the display idle 100ms after the last frame, the power HAL
+    # waits for it (fb0/idle_state) to end interaction boosts
+    write /sys/class/graphics/fb0/idle_time 100
+
     chown bluetooth bluetooth /sys/class/rfkill/rfkill0/type
     chown bluetooth bluetooth /sys/class/rfkill/rfkill0/state
     chmod 0660 /sys/class/rfkill/rfkill0/state
