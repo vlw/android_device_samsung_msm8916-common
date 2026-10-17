@@ -140,7 +140,7 @@ void set_lte_properties()
 	property_override("persist.radio.lte_vrte_ltd", "1");
 	property_override("telephony.lteOnCdmaDevice", "0");
 	property_override("telephony.lteOnGsmDevice", "1");
-	property_override("ro.telephony.default_network", "10");
+	property_override("ro.telephony.default_network", "9");
 }
 
 void set_wifi_properties()

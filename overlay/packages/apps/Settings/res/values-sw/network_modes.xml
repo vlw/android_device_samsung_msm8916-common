@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2026 The LineageOS Project
+
+     SPDX-License-Identifier: Apache-2.0
+-->
+<resources>
+    <string-array name="preferred_network_mode_choices">
+        <item>"LTE/3G/2G otomatiki"</item>
+        <item>"LTE/3G otomatiki"</item>
+        <item>"LTE pekee"</item>
+        <item>"3G/2G otomatiki"</item>
+        <item>"3G pekee"</item>
+        <item>"2G pekee"</item>
+    </string-array>
+</resources>

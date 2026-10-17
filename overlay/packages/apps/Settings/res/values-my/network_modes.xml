@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2026 The LineageOS Project
+
+     SPDX-License-Identifier: Apache-2.0
+-->
+<resources>
+    <string-array name="preferred_network_mode_choices">
+        <item>"LTE/3G/2G အလိုအလျောက်ပြောင်းရန်"</item>
+        <item>"LTE/3G အလိုအလျောက်ပြောင်းရန်"</item>
+        <item>"LTE သာ"</item>
+        <item>"3G/2G အလိုအလျောက်ပြောင်းရန်"</item>
+        <item>"3G သာ"</item>
+        <item>"2G သာ"</item>
+    </string-array>
+</resources>

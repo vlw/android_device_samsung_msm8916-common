@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2026 The LineageOS Project
+
+     SPDX-License-Identifier: Apache-2.0
+-->
+<resources>
+    <string-array name="preferred_network_mode_choices">
+        <item>"LTE/3G/2G outomaties"</item>
+        <item>"LTE/3G outomaties"</item>
+        <item>"Net LTE"</item>
+        <item>"3G/2G outomaties"</item>
+        <item>"Net 3G"</item>
+        <item>"Net 2G"</item>
+    </string-array>
+</resources>

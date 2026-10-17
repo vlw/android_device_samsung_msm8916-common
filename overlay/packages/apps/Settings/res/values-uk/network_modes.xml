@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2026 The LineageOS Project
+
+     SPDX-License-Identifier: Apache-2.0
+-->
+<resources>
+    <string-array name="preferred_network_mode_choices">
+        <item>"Авто LTE/3G/2G"</item>
+        <item>"Авто LTE/3G"</item>
+        <item>"Лише LTE"</item>
+        <item>"Авто 3G/2G"</item>
+        <item>"Лише 3G"</item>
+        <item>"Лише 2G"</item>
+    </string-array>
+</resources>

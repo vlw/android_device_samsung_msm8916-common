@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2026 The LineageOS Project
+
+     SPDX-License-Identifier: Apache-2.0
+-->
+<resources>
+    <string-array name="preferred_network_mode_choices">
+        <item>"LTE/3G/2G ਸਵੈਚਲਿਤ"</item>
+        <item>"LTE/3G ਸਵੈਚਲਿਤ"</item>
+        <item>"ਸਿਰਫ਼ LTE"</item>
+        <item>"3G/2G ਸਵੈਚਲਿਤ"</item>
+        <item>"ਸਿਰਫ਼ 3G"</item>
+        <item>"ਸਿਰਫ਼ 2G"</item>
+    </string-array>
+</resources>

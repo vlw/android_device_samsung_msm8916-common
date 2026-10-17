@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+     Copyright (C) 2026 The LineageOS Project
+
+     SPDX-License-Identifier: Apache-2.0
+-->
+<resources>
+    <string-array name="preferred_network_mode_choices">
+        <item>"Automaattinen LTE/3G/2G"</item>
+        <item>"Automaattinen LTE/3G"</item>
+        <item>"Vain LTE"</item>
+        <item>"Automaattinen 3G/2G"</item>
+        <item>"Vain 3G"</item>
+        <item>"Vain 2G"</item>
+    </string-array>
+</resources>
