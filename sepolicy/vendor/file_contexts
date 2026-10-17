@@ -9,7 +9,10 @@
 /data/vendor/mediadrm(/.*)?                             u:object_r:mediadrm_vendor_data_file:s0
 
 # sysfs
-/sys/devices(/.*)?/input/input[1-2]/enabled             u:object_r:sysfs_hal_pwr:s0
+# Keep these paths exact: a (/.*)? in the middle makes restorecon walk all of
+# /sys/devices during coldboot since no directory can be pruned anymore
+/sys/devices/soc\.0/i2c\.72/i2c-7/7-0020/input/input[0-9]+/enabled           u:object_r:sysfs_hal_pwr:s0
+/sys/devices/soc\.0/78b9000\.i2c/i2c-5/5-0020/input/input[0-9]+/enabled     u:object_r:sysfs_hal_pwr:s0
 
 # block devices
 /dev/block/platform/msm_sdcc\.1/by-name/efs             u:object_r:efs_block_device:s0
