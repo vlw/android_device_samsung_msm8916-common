@@ -1,1 +1,2 @@
 allow perfd proc_kernel_sched:file { open read write };
+get_prop(perfd, default_prop)

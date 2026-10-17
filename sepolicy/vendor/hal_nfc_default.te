@@ -2,3 +2,8 @@ allow hal_nfc_default nfc_fw_file:file r_file_perms;
 allow hal_nfc_default system_data_file:file r_file_perms;
 allow hal_nfc_default nfc_data_file:dir search;
 allow hal_nfc_default nfc_data_file:file getattr;
+
+# The Samsung NFC HAL module reads legacy Samsung properties
+get_prop(hal_nfc_default, default_prop)
+get_prop(hal_nfc_default, radio_prop)
+get_prop(hal_nfc_default, system_prop)

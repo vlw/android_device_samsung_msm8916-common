@@ -2,3 +2,6 @@
 allow kernel domain:process setsched;
 allow kernel audio_device:chr_file rw_file_perms;
 allow kernel untrusted_app:fd { use };
+
+# The WCNSS driver reads the MAC address from /efs while loading Pronto
+allow kernel self:capability dac_override;

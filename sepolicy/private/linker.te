@@ -1,0 +1,3 @@
+# The linker checks every TARGET_LD_SHIM_LIBS path with access(), a denial
+# only makes it use the path unresolved, which is what it matches anyway
+dontaudit domain mediaserver_exec:file { getattr read };

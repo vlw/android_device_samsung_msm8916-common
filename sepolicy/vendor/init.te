@@ -69,3 +69,6 @@ allow init adb_data_file:dir search;
 allow init kernel:security { check_context };
 
 allow init proc_sec_simslot:file r_file_perms;
+
+# processgroup hierarchy is mounted with the cgroup_v2 context
+allow init cgroup_v2:filesystem relabelto;
