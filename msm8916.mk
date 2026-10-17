@@ -282,6 +282,10 @@ PRODUCT_SOONG_NAMESPACES += \
     device/samsung/msm8916-common \
     hardware/samsung/aidl/power-libperfmgr
 
+# Wi-Fi overlay
+PRODUCT_PACKAGES += \
+    WifiOverlay
+
 # TimeKeep
 PRODUCT_PACKAGES += \
     timekeep \
