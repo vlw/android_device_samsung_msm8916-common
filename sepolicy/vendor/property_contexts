@@ -3,6 +3,7 @@ persist.ril.                                     u:object_r:radio_prop:s0
 persist.vendor.timeadjust                        u:object_r:vendor_timekeep_prop:s0
 service.camera.hdmi_preview                      u:object_r:camera_prop:s0
 persist.soc_camera.                              u:object_r:camera_prop:s0
+persist.vendor.camera.privapp.list               u:object_r:vendor_persist_camera_prop:s0
 
 # Hardware
 ro.hardware.chipname                             u:object_r:exported_default_prop:s0

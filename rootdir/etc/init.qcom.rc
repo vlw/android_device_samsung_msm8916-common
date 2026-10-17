@@ -129,6 +129,13 @@ on boot
     # waits for it (fb0/idle_state) to end interaction boosts
     write /sys/class/graphics/fb0/idle_time 100
 
+    # The camera HAL switches the CSC of the camera preview to wide band
+    # and adjusts the minimum GPU power level while it is open
+    chown system camera /sys/class/graphics/fb0/csc_cfg
+    chmod 0664 /sys/class/graphics/fb0/csc_cfg
+    chown system camera /sys/class/kgsl/kgsl-3d0/min_pwrlevel
+    chmod 0664 /sys/class/kgsl/kgsl-3d0/min_pwrlevel
+
     chown bluetooth bluetooth /sys/class/rfkill/rfkill0/type
     chown bluetooth bluetooth /sys/class/rfkill/rfkill0/state
     chmod 0660 /sys/class/rfkill/rfkill0/state
