@@ -61,3 +61,13 @@ LOCAL_MODULE_CLASS := ETC
 LOCAL_SRC_FILES    := etc/ueventd.qcom.rc
 LOCAL_MODULE_PATH  := $(TARGET_OUT_VENDOR_ETC)
 include $(BUILD_PREBUILT)
+
+# Drop the serif CJK font (~24MB), NotoSansCJK still covers CJK text
+include $(CLEAR_VARS)
+LOCAL_MODULE               := RemoveNotoSerifCJK
+LOCAL_MODULE_CLASS         := ETC
+LOCAL_MODULE_TAGS          := optional
+LOCAL_OVERRIDES_MODULES    := NotoSerifCJK-Regular.ttc
+LOCAL_UNINSTALLABLE_MODULE := true
+LOCAL_SRC_FILES            := /dev/null
+include $(BUILD_PREBUILT)

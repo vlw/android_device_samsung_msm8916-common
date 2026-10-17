@@ -232,6 +232,10 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.opengles.aep.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.opengles.aep.xml
 endif
 
+# Fonts
+PRODUCT_PACKAGES += \
+    RemoveNotoSerifCJK
+
 # Dexopt
 # Prebuilt apps only ship verified, so let the daily background dexopt
 # compile them fully on /data instead of leaving them on the interpreter
