@@ -35,7 +35,9 @@ namespace android {
 // Enable verbose logging
 #define VDBG 0
 
+#ifndef MIN
 #define MIN(a,b) ((a)<(b) ? (a) : (b))
+#endif
 
 // Enable RILC log
 #define RILC_LOG 0

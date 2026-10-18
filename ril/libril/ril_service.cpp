@@ -18,6 +18,7 @@
 #define LOG_TAG "RILC"
 
 #include "LegacyDataProfile.h"
+#include "LegacySimAuth.h"
 #include <android/hardware/radio/1.1/IRadio.h>
 #include <android/hardware/radio/1.1/IRadioResponse.h>
 #include <android/hardware/radio/1.1/IRadioIndication.h>
@@ -2403,7 +2404,16 @@ Return<void> RadioImpl::requestIccSimAuthentication(int32_t serial, int32_t auth
 
     pf.authContext = authContext;
 
-    if (!copyHidlStringToRil(&pf.authData, authData, pRI)) {
+    // Samsung's legacy adaptor expects hex RAND/AUTN, while the HIDL API
+    // supplies Base64. Keep the standard representation for newer RILs.
+    std::string legacyAuth;
+    const bool legacy = s_vendorFunctions->version <= 14;
+    if (legacy && !legacySimAuthChallenge(authContext, authData.c_str(), &legacyAuth)) {
+        sendErrorResponse(pRI, RIL_E_INVALID_ARGUMENTS);
+        return Void();
+    }
+    if (!copyHidlStringToRil(&pf.authData,
+            legacy ? hidl_string(legacyAuth) : authData, pRI)) {
         return Void();
     }
 
@@ -6265,6 +6275,16 @@ int radio::requestIccSimAuthenticationResponse(int slotId,
         IccIoResult result = responseIccIo(responseInfo, serial, responseType, e, response,
                 responseLen);
 
+        if (s_vendorFunctions->version <= 14 && e == RIL_E_SUCCESS &&
+                result.simResponse.size() > 0) {
+            std::string base64;
+            if (legacySimAuthResponse(result.simResponse.c_str(), &base64)) {
+                result.simResponse = base64;
+            } else {
+                responseInfo.error = RadioError::INVALID_RESPONSE;
+                result.simResponse = hidl_string();
+            }
+        }
         Return<void> retStatus
                 = radioService[slotId]->mRadioResponse->requestIccSimAuthenticationResponse(
                 responseInfo, result);
