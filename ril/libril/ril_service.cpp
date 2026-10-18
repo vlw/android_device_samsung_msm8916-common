@@ -17,6 +17,7 @@
 
 #define LOG_TAG "RILC"
 
+#include "LegacyDataProfile.h"
 #include <android/hardware/radio/1.1/IRadio.h>
 #include <android/hardware/radio/1.1/IRadioResponse.h>
 #include <android/hardware/radio/1.1/IRadioIndication.h>
@@ -1101,7 +1102,8 @@ Return<void> RadioImpl::setupDataCall(int32_t serial, RadioTechnology radioTechn
                 (isRoaming ? dataProfileInfo.roamingProtocol : dataProfileInfo.protocol);
         dispatchStrings(serial, mSlotId, RIL_REQUEST_SETUP_DATA_CALL, true, 7,
             std::to_string((int) radioTechnology + 2).c_str(),
-            std::to_string((int) dataProfileInfo.profileId).c_str(),
+            std::to_string(legacyDataProfileId((int) dataProfileInfo.profileId,
+                    dataProfileInfo.supportedApnTypesBitmap)).c_str(),
             dataProfileInfo.apn.c_str(),
             dataProfileInfo.user.c_str(),
             dataProfileInfo.password.c_str(),
