@@ -251,6 +251,9 @@ PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/powerhint.json:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.json
 
 # Radio
+DEVICE_RIL_LIBPATH ?= /vendor/lib/libsec-ril.so
+PRODUCT_SYSTEM_PROPERTIES += vendor.rild.libpath=$(DEVICE_RIL_LIBPATH)
+
 PRODUCT_PACKAGES += \
     libcnefeatureconfig \
     librmnetctl \
