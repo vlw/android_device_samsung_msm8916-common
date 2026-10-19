@@ -848,7 +848,7 @@ void LocEngReportSv::proc() const {
     if (locEng->mute_session_state != LOC_MUTE_SESS_IN_SESSION)
     {
         if (locEng->sv_status_cb != NULL) {
-            locEng->sv_status_cb((GpsSvStatus*)&(mSvStatus),
+            locEng->sv_status_cb(&mSvStatus,
                                  (void*)mSvExt);
         }
 

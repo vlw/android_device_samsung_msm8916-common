@@ -42,7 +42,7 @@ extern "C" {
 #define XTRA_DATA_MAX_SIZE 100000 /*bytes*/
 
 typedef void (*loc_location_cb_ext) (UlpLocation* location, void* locExt);
-typedef void (*loc_sv_status_cb_ext) (GpsSvStatus* sv_status, void* svExt);
+typedef void (*loc_sv_status_cb_ext) (const HaxxSvStatus* sv_status, void* svExt);
 typedef void* (*loc_ext_parser)(void* data);
 
 typedef struct {

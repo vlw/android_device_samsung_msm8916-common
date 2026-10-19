@@ -33,6 +33,8 @@
 #include <hardware/gps.h>
 #include <gps_extended.h>
 #include <loc_eng.h>
+#include "gnss_sv.h"
+#include <stddef.h>
 #include <loc_target.h>
 #include <loc_log.h>
 #include <fcntl.h>
@@ -52,10 +54,11 @@ using namespace loc_core;
 //Globals defns
 static gps_location_callback gps_loc_cb = NULL;
 static gps_sv_status_callback gps_sv_cb = NULL;
+static gnss_sv_status_callback gnss_sv_cb = NULL;
 static gps_ni_notify_callback gps_ni_cb = NULL;
 
 static void local_loc_cb(UlpLocation* location, void* locExt);
-static void local_sv_cb(GpsSvStatus* sv_status, void* svExt);
+static void local_sv_cb(const HaxxSvStatus* sv_status, void* svExt);
 static void local_ni_cb(GpsNiNotification *notification, bool esEnalbed);
 
 GpsNiExtCallbacks sGpsNiExtCallbacks = {
@@ -314,19 +317,21 @@ static int loc_init(GpsCallbacks* callbacks)
 
     gps_loc_cb = callbacks->location_cb;
     gps_sv_cb = callbacks->sv_status_cb;
+    gnss_sv_cb = callbacks->size >= offsetof(GpsCallbacks, gnss_sv_status_cb) +
+                    sizeof(callbacks->gnss_sv_status_cb) ? callbacks->gnss_sv_status_cb : NULL;
 
     retVal = loc_eng_init(loc_afw_data, &clientCallbacks, event, NULL);
+    if (retVal || loc_afw_data.adapter == NULL) {
+        LOC_LOGE("loc_eng_init() fail!");
+        if (!retVal) retVal = -1;
+        goto err;
+    }
     loc_afw_data.adapter->mSupportsAgpsRequests = !loc_afw_data.adapter->hasAgpsExtendedCapabilities();
     loc_afw_data.adapter->mSupportsPositionInjection = !loc_afw_data.adapter->hasCPIExtendedCapabilities();
     loc_afw_data.adapter->mSupportsTimeInjection = !loc_afw_data.adapter->hasCPIExtendedCapabilities();
     loc_afw_data.adapter->setGpsLockMsg(0);
     loc_afw_data.adapter->requestUlp(getCarrierCapabilities());
     loc_afw_data.adapter->setXtraUserAgent();
-
-    if(retVal) {
-        LOC_LOGE("loc_eng_init() fail!");
-        goto err;
-    }
 
     loc_afw_data.adapter->setPowerVoteRight(loc_get_target() == TARGET_QCA1530);
     loc_afw_data.adapter->setPowerVote(true);
@@ -364,6 +369,7 @@ static void loc_cleanup()
     loc_eng_cleanup(loc_afw_data);
     gps_loc_cb = NULL;
     gps_sv_cb = NULL;
+    gnss_sv_cb = NULL;
 
     EXIT_LOG(%s, VOID_RET);
 }
@@ -1072,12 +1078,19 @@ static void local_loc_cb(UlpLocation* location, void* locExt)
     EXIT_LOG(%s, VOID_RET);
 }
 
-static void local_sv_cb(GpsSvStatus* sv_status, void* svExt)
+static void local_sv_cb(const HaxxSvStatus* sv_status, void* svExt)
 {
     ENTRY_LOG();
-    if (NULL != gps_sv_cb) {
+    if (sv_status == NULL) return;
+    if (gnss_sv_cb != NULL) {
+        GnssSvStatus modern;
+        loc_convert_sv_status(*sv_status, modern);
+        gnss_sv_cb(&modern);
+    } else if (gps_sv_cb != NULL) {
+        GpsSvStatus legacy;
+        loc_convert_legacy_sv_status(*sv_status, legacy);
         CALLBACK_LOG_CALLFLOW("sv_status_cb -", %d, sv_status->num_svs);
-        gps_sv_cb(sv_status);
+        gps_sv_cb(&legacy);
     }
     EXIT_LOG(%s, VOID_RET);
 }

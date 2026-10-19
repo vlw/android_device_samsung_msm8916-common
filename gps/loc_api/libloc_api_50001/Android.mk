@@ -72,6 +72,7 @@ LOCAL_SHARED_LIBRARIES := \
 
 LOCAL_SRC_FILES += \
     loc.cpp \
+    gnss_sv.cpp \
     gps.c
 
 LOCAL_CFLAGS += \
