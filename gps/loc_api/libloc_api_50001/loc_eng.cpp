@@ -61,6 +61,9 @@
 #include <string.h>
 
 #include <loc_eng.h>
+#ifdef SAMSUNG_GNSS_RF_CONFIG
+#include "samsung_gnss_rf.h"
+#endif
 #include <loc_eng_ni.h>
 #include <loc_eng_dmn_conn.h>
 #include <loc_eng_dmn_conn_handler.h>
@@ -1926,6 +1929,11 @@ static int loc_eng_start_handler(loc_eng_data_s_type &loc_eng_data)
    int ret_val = LOC_API_ADAPTER_ERR_SUCCESS;
 
    if (!loc_eng_data.adapter->isInSession()) {
+#ifdef SAMSUNG_GNSS_RF_CONFIG
+       // This handler is also reached when an active session recovers from SSR.
+       int rf_result = samsung_gnss::applyStockRfConfig();
+       if (rf_result) LOC_LOGW("Samsung GNSS RF setup failed: %d", rf_result);
+#endif
        ret_val = loc_eng_data.adapter->startFix();
 
        if (ret_val == LOC_API_ADAPTER_ERR_SUCCESS ||

@@ -25,6 +25,12 @@ LOCAL_SRC_FILES += \
     loc_eng_nmea.cpp \
     LocEngAdapter.cpp
 
+# Samsung's runtime RF selector must also be restored after modem SSR.
+ifeq ($(TARGET_DEVICE),a3lte)
+LOCAL_SRC_FILES += samsung_gnss_rf.cpp
+LOCAL_CFLAGS += -DSAMSUNG_GNSS_RF_CONFIG
+endif
+
 LOCAL_SRC_FILES += \
     loc_eng_dmn_conn.cpp \
     loc_eng_dmn_conn_handler.cpp \
