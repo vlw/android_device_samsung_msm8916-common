@@ -152,3 +152,58 @@ proves the precise cause of the parser failure or stock-equivalent operation.
 CQI1 CP firmware from the supplied Android 6 CSG3 archive has been extracted
 for a separately authorized compatibility test. BOEC remains installed; no
 direct writes to modem, EFS or NV partitions are performed by these changes.
+
+BOEC library/firmware comparison (2026-10-20)
+-------------------------------------------
+Offline inspection of the actual LOC IDL tables establishes the following:
+                         BOEC       stock Android 5  current blob  stock Android 6
+LOC minor version        29         33               44            48
+LOC 0x35 request struct   1044       1044             1044          1044
+LOC 0x35 maximum wire     1053       1053             1053          1053
+LOC 0x35 indication       8          8                8             8
+The meaningful request descriptor bytes are identical in all four images:
+  01020002010403010604700c000404c410821004
+The indication descriptor is also identical: 010200c2100106.
+Different LOC minor versions do not imply an incompatible 0x35 wire schema.
+
+LOC 0x37 validity refers to aggregate index 23 on BOEC and 25 in the AP blobs.
+These are equivalent aggregates: 16-byte native struct, descriptor 0300010820,
+with uint64 UTC seconds and uint16 duration hours. Native struct padding is
+not part of the 10-byte wire aggregate. UTC injection 0x38 also has identical
+request/indication descriptors in all four images. Do not reinterpret the
+validity timestamp as milliseconds or the aggregate index as a format change.
+
+Both supplied stock gps.conf files and BOEC's embedded URLs name xtra3grc.bin.
+This rules out a blanket claim that BOEC was designed only for xtra.bin.
+It does not prove compatibility with every current file served at that name.
+The AP setXtraData implementations copy the payload unchanged into 1024-byte
+parts, including the actual short final part, with format selector 0. There
+is no observed stock-specific padding, decompression or terminal command.
+The current and Android 5 IDL encoders were additionally compared byte for
+byte with raw TLVs at final payload lengths 1, 512, 1023 and 1024: all matched.
+
+A full matching Android 5 library-set probe submitted a 27504-byte file and
+received INVALID_PARAMETER at part 27, while its public API returned 0.
+However, the saved log also shows the normal GNSS service running concurrently
+(PID 2049 alongside stock probe PID 2042), plus ENGINE_BUSY/timeouts during
+configuration. This is evidence that stock code can reach the same rejection,
+not a clean stock-only control or proof that modem state cannot be responsible.
+A subsequent three-format control was interrupted; do not count it as passed.
+No new phone operations followed the user's request for offline-only analysis.
+
+Build the optional a3_gnss_xtra_encode_test to compare a blob's real IDL encoder
+with the raw 0x35 TLVs. It takes the library path and sends no QMI requests.
+The optional a3_gnss_stock_xtra_test takes a matching stock GPS HAL path and
+one to three existing orbit files. Unlike the encoder probe, it starts GNSS,
+injects UTC/orbits and runs Samsung initialization, which may update modem
+settings. Use only with authorized device testing and matching stock support
+libraries in an isolated linker path. Stop AND verify absence of the normal
+GNSS service for the entire probe; framework requests can start lazy services
+again. Its return value alone is not an orbit acceptance check.
+
+The exact final-file rejection cause remains unproven: file validation,
+time/week interpretation and modem state are still candidates. In particular,
+IDL presence of a command does not prove the running handler supports it;
+0x85 version-check calls fail in the saved stock/current logs despite having
+an IDL entry. Neither firmware flashing nor blind NV/checksum/time changes
+are justified as a demonstrated fix by this analysis.
