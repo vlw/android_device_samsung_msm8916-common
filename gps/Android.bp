@@ -31,3 +31,20 @@ cc_binary {
     shared_libs: ["libdl"],
     cflags: ["-Wall", "-Wextra", "-Werror"],
 }
+
+cc_binary {
+    name: "a3_gnss_xtra_encode_test",
+    vendor: true,
+    srcs: ["tests/xtra_encode_test.cpp"],
+    shared_libs: ["libdl"],
+    cflags: ["-Wall", "-Wextra", "-Werror"],
+}
+
+cc_binary {
+    name: "a3_gnss_stock_xtra_test",
+    vendor: true,
+    srcs: ["tests/stock_xtra_test.cpp"],
+    header_libs: ["libhardware_headers"],
+    shared_libs: ["libdl"],
+    cflags: ["-Wall", "-Wextra", "-Werror"],
+}
