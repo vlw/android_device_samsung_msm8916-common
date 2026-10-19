@@ -48,8 +48,6 @@ on fs
 
     mount_all /vendor/etc/fstab.qcom --early
 
-    restorecon_recursive /persist
-
     # GnssConfiguration doesn't actually look at gps.conf, just the debug file
     mount none /system/etc/gps.conf /system/etc/gps_debug.conf bind
 
@@ -146,6 +144,9 @@ on boot
     mkdir /dev/socket/qmux_audio 2770 media audio
     mkdir /dev/socket/qmux_bluetooth 2770 bluetooth bluetooth
     mkdir /dev/socket/qmux_gps 0770 gps gps
+
+    # Device post-fs-data actions have now established any /data bind mount.
+    restorecon_recursive /persist
 
     # Create persist folders
     mkdir /persist/alarm 0770 system system
