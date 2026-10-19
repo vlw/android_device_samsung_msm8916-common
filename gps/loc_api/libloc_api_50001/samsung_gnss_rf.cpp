@@ -30,7 +30,7 @@ using Send = int (*)(void*, unsigned int, const void*, unsigned int, void*, unsi
 using Release = int (*)(void*);
 using GetField = int (*)(const void*, uint32_t*);
 
-int transact(bool apply) {
+int transact(unsigned int message) {
     static_assert(sizeof(ServiceObject) == 48, "Stock QMI service metadata is ARM32");
     static_assert(sizeof(OsParams) == 16, "CCI OS signal ABI is ARM32 bionic");
     void* library = dlopen("libqmi_cci.so", RTLD_NOW | RTLD_LOCAL);
@@ -51,15 +51,16 @@ int transact(bool apply) {
         if (rc || !client) {
             ALOGW("Samsung GNSS: SECGPS discovery failed: %d", rc);
             result = -ENODEV;
-        } else if (!apply) {
+        } else if (!message) {
             result = 0;
         } else {
             uint8_t reply[64]{};
             unsigned int received = 0;
-            rc = send(client, 9, kStockRfRequest, sizeof(kStockRfRequest), reply, sizeof(reply),
+            rc = send(client, message, kStockRfRequest, sizeof(kStockRfRequest), reply, sizeof(reply),
                       &received, 1000);
             result = rc ? -EIO : received <= sizeof(reply) ? parseRfReply(reply, received) : -EPROTO;
-            ALOGI("Samsung GNSS: stock RF selector 1: transport=%d result=%d", rc, result);
+            ALOGI("Samsung GNSS: %s: transport=%d result=%d",
+                  message == 8 ? "stock XTRA enable" : "stock RF selector 1", rc, result);
         }
     }
     if (client && release) release(client);
@@ -89,6 +90,7 @@ int parseRfReply(const uint8_t* bytes, size_t length) {
     return seen ? result : -EPROTO;
 }
 
-int discoverRfService() { return transact(false); }
-int applyStockRfConfig() { return transact(true); }
+int discoverRfService() { return transact(0); }
+int applyStockRfConfig() { return transact(9); }
+int enableStockXtra() { return transact(8); }
 }

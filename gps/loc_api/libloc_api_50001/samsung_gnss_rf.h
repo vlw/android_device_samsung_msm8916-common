@@ -10,4 +10,6 @@ constexpr uint8_t kStockRfRequest[] = {0x01, 0x01, 0x00, 0x01};
 int parseRfReply(const uint8_t* bytes, size_t length);
 int discoverRfService();
 int applyStockRfConfig();
+// SECGPS message 8: stock Samsung XTRA enable (PDSM parameter 0x2b).
+int enableStockXtra();
 }

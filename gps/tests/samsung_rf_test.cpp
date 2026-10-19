@@ -6,6 +6,11 @@
 #define CHECK(x) do { if (!(x)) { std::fprintf(stderr, "FAIL line %d: %s\n", __LINE__, #x); return 1; } } while (0)
 int main(int argc, char** argv) {
     using namespace samsung_gnss;
+    if (argc == 2 && !std::strcmp(argv[1], "--enable-stock-xtra")) {
+        int result = enableStockXtra();
+        std::printf("Stock XTRA enable / modem acknowledgement: %d\n", result);
+        return result ? 1 : 0;
+    }
     if (argc == 2 && !std::strcmp(argv[1], "--discover")) {
         int result = discoverRfService();
         std::printf("SECGPS v1 discovery (no requests sent): %d\n", result);

@@ -34,6 +34,9 @@
 #include <MsgTask.h>
 #include "log_util.h"
 #include "platform_lib_includes.h"
+#ifdef SAMSUNG_GNSS_RF_CONFIG
+#include "samsung_gnss_rf.h"
+#endif
 
 using namespace loc_core;
 
@@ -72,6 +75,11 @@ struct LocEngInjectXtraData : public LocMsg {
         delete[] mData;
     }
     inline virtual void proc() const {
+#ifdef SAMSUNG_GNSS_RF_CONFIG
+        // Samsung's modem gates orbit injection separately from the RF selector.
+        const int enabled = samsung_gnss::enableStockXtra();
+        if (enabled) LOC_LOGE("Samsung XTRA enable failed: %d", enabled);
+#endif
         const auto result = mAdapter->setXtraData(mData, mLen);
         LOC_LOGI("XTRA adapter submission: bytes=%d return=%d", mLen, result);
     }
