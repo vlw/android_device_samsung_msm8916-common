@@ -1,0 +1,116 @@
+SM-A300FU GNSS compatibility
+===========================
+
+Assistance and satellite reports
+-------------------------------
+The device config restores the stock MSB/MSA capability bits (0x37) and
+SUPL_MODE=3. Without both capability bits, loc_eng_set_position_mode forces
+standalone and the SUPL state machine is not created. PSDS URLs retain the
+Android 12 LONGTERM_PSDS_SERVER names and HTTPS; copying the old stock HTTP
+XTRA_SERVER names would not configure the Android 12 downloader.
+
+Keep the proprietary libloc_api_v02 HaxxSvStatus ABI intact (672 bytes on ARM).
+Convert it at the framework callback boundary, preserving the separate GPS,
+GLONASS and 64-bit BeiDou used-in-fix masks. Use gnss_sv_status_cb when present;
+copy to a correctly sized legacy GpsSvStatus otherwise. Only GPS has ephemeris
+and almanac masks in this ABI; do not invent these flags for other systems.
+C/N0, elevation and azimuth are copied without gain offsets. This conversion
+does not remove the proprietary input's 32-SV limit.
+
+Samsung RF selector
+-------------------
+Evidence: A300FU Android 5 BPE1/BOJ4 and Android 6 CSG3 stock AP libraries,
+plus the running A300FUXXU1BOEC modem image. No firmware or NV was patched.
+
+The stock libgps.utils configuration table maps GNSS_RF_CONFIG to offset 0x88
+in sec_gps_conf. Its initialization writes 1. libloc_eng forwards the setting
+through LocApiV02::setGnssRfConfig to SECGPS, a private QMI v1 service 0xe8.
+
+Message 9 has a one-byte request and one-byte reply, each mandatory TLV 1.
+Stock request: 01 01 00 01. Success reply: 01 01 00 00. The decoder treats a
+nonzero response as failure and rejects malformed, duplicate or missing TLVs;
+the stock C++ wrapper instead discarded the transport result.
+
+The modem's QMI_SECGPS_SET_GLONASS_ENABLE handler (physical image address
+0x8752b3b0) logs "GNSS RF setting from AP" and passes the selector to PDSM
+parameter 0x2c. It preserves selectors 0, 1, 3 and 7, mapping other values to 7.
+It replies 0 after the parameter request is accepted, and 0xff on failure.
+This is a GNSS RF/configuration selector, not a gain, GPIO or voltage value.
+The exact physical meaning of every nondefault mode is not established.
+The implementation intentionally sends only the confirmed board default 1;
+it does not expose arbitrary modes or claim increased antenna gain.
+
+Use CCI's raw API, retaining only IDL service-discovery metadata. Validate the
+library's service ID/version accessors before connecting. No guessed codec
+tables or proprietary C++ vtable changes are required. Discovery and requests
+have bounded timeouts. Failure is logged and must not stop ordinary GNSS.
+
+Apply from the serialized start handler, including its engine-up/SSR recovery
+path, before startFix. Compile this hook only for TARGET_DEVICE=a3lte.
+
+IPC Router defaults unknown services to NET_RAW. Stock loc_launcher had that
+group; the current GNSS HAL does not. sec_config grants only the gps group
+access to service 232, rather than granting NET_RAW or weakening the default.
+init creates gpsone_d for the legacy assistance pipes, with location-data
+labeling inherited from /data/misc/location.
+
+Validation
+----------
+Build optional a3_gnss_sv_test and a3_gnss_rf_test (not product packages).
+Run both without arguments for conversion/protocol regression cases.
+Build a3_gnss_psds_test for a separate injection-only integration test. It takes
+an existing downloaded XTRA3 binary, sends it through the actual HIDL extension,
+and reports queue acceptance. LocEngInjectXtraData logs the adapter return;
+the proprietary adapter can return success even after a modem rejection, so
+check its QMI indication log as well. Queue/adapter success is not proof of
+a successful modem transaction.
+RF test --discover only opens/releases SECGPS; it sends no RF request.
+RF test --apply-stock sends exactly the default 1 and requires its modem ACK.
+Also validate the production HAL under the gps UID: root discovery/request
+success alone does not test IPC Router permissions.
+
+GnssSessionProbe.java is an optional 30-second app_process client. Compile
+against framework-minus-apex.jar and dex with d8, then run from a root ADB
+shell with its dex in CLASSPATH. It drops the client to system UID so that
+the package android matches LocationManager's identity validation. It prints
+only counts, used masks, C/N0, elapsed time and accuracy, never coordinates.
+It removes listeners after testing and does not delete aiding data.
+Optional --assist uses Android 12 force_psds_injection and requests fresh
+PSDS and time injection without deleting
+existing assistance. Request acceptance alone does not prove modem injection.
+
+Live validation can replace the two libraries and device GPS config, then
+restart only vendor.gnss_service. Refresh any gps_debug.conf bind mount after
+atomically replacing gps.conf, or the framework may keep the old inode.
+Apply only the new IPC rule for a live test; do not duplicate existing rules.
+Do not reboot merely to apply these changes.
+
+A short indoor session and synthetic conversion cases establish integration,
+not stock-equivalent TTFF, RF sensitivity, or all constellation configurations.
+Modem SSR recovery is covered by the shared source path, not destructive SSR
+fault injection during device validation.
+
+Deployment observations (2026-10-20)
+----------------------------------
+The phone's network resolves legacy xtrapath*.izatcloud.net to Oregon servers
+whose TLS leaf certificate expired in 2022. Public DNS from the workstation
+resolves those names to a CDN with a current certificate. A diagnostic request
+to that CDN from the phone, retaining the proper SNI and TLS verification,
+returns HTTP 403 explicitly stating that access from this country is blocked.
+Do not pin CDN IPs, disable certificate verification, or silently substitute
+unknown assistance providers. These external failures can prevent automatic
+PSDS downloads despite working HAL support. Mobile data is disabled on this
+phone; Android rejects the SUPL cellular network request for that reason.
+Neither user setting nor network DNS is changed by these patches.
+The framework's "Unable to initialize IGnssXtra interface" info message is
+misleading in this source version: its branch logs it after successful callback
+registration. Do not interpret that line alone as an extension failure.
+
+Direct injection of current HTTPS-downloaded xtra3grc.bin and xtra2.bin through
+the production HIDL extension reaches the modem, which rejects the last chunk
+with eQMI_LOC_INVALID_PARAMETER_V02 despite eLOC_CLIENT_SUCCESS transport.
+The current and stock Android 6 setXtraData implementations both send message
+0x35, 1024-byte chunks and the same format selector. Do not report PSDS as
+end-to-end restored merely because the HAL queued it. Current assistance data
+compatibility with the old BOEC modem is unresolved; no modem firmware is
+flashed and no aiding data is deleted during these tests.

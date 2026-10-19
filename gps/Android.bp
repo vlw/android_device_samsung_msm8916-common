@@ -1,0 +1,25 @@
+cc_binary {
+    name: "a3_gnss_sv_test",
+    vendor: true,
+    srcs: ["tests/sv_status_test.cpp", "loc_api/libloc_api_50001/gnss_sv.cpp"],
+    local_include_dirs: ["loc_api/libloc_api_50001", "core"],
+    header_libs: ["libhardware_headers"],
+    cflags: ["-Wall", "-Wextra", "-Werror"],
+}
+
+cc_binary {
+    name: "a3_gnss_rf_test",
+    vendor: true,
+    srcs: ["tests/samsung_rf_test.cpp", "loc_api/libloc_api_50001/samsung_gnss_rf.cpp"],
+    local_include_dirs: ["loc_api/libloc_api_50001"],
+    shared_libs: ["libdl", "liblog"],
+    cflags: ["-Wall", "-Wextra", "-Werror"],
+}
+
+cc_binary {
+    name: "a3_gnss_psds_test",
+    vendor: true,
+    srcs: ["tests/psds_inject_test.cpp"],
+    shared_libs: ["android.hardware.gnss@1.0", "libhidlbase", "libutils"],
+    cflags: ["-Wall", "-Wextra", "-Werror"],
+}
