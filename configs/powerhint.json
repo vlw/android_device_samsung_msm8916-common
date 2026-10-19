@@ -69,6 +69,12 @@
             "Value": "2"
         },
         {
+            "PowerHint": "INTERACTION",
+            "Node": "GPUMinFreq",
+            "Duration": 0,
+            "Value": "310000000"
+        },
+        {
             "PowerHint": "LAUNCH",
             "Node": "CPUMinFreq",
             "Duration": 5000,
