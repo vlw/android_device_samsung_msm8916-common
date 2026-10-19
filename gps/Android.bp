@@ -23,3 +23,11 @@ cc_binary {
     shared_libs: ["android.hardware.gnss@1.0", "libhidlbase", "libutils"],
     cflags: ["-Wall", "-Wextra", "-Werror"],
 }
+
+cc_binary {
+    name: "a3_gnss_psds_status",
+    vendor: true,
+    srcs: ["tests/psds_status_test.cpp"],
+    shared_libs: ["libdl"],
+    cflags: ["-Wall", "-Wextra", "-Werror"],
+}

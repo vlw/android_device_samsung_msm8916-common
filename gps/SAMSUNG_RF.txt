@@ -114,3 +114,41 @@ The current and stock Android 6 setXtraData implementations both send message
 end-to-end restored merely because the HAL queued it. Current assistance data
 compatibility with the old BOEC modem is unresolved; no modem firmware is
 flashed and no aiding data is deleted during these tests.
+
+PSDS follow-up (2026-10-20)
+--------------------------
+Direct HTTPS downloads from the phone in Belarus succeeded for:
+  https://xtrapath9.izatcloud.net/xtra3grc.bin (27504 bytes)
+  https://xtrapath10.izatcloud.net/xtra3grc.bin (34335 bytes)
+Both use normal hostname/certificate verification. Configure only these two
+LONGTERM_PSDS_SERVER entries; do not randomly select a known failing endpoint.
+The GrapheneOS Qualcomm cache is reachable but only serves xtra3Mgrbeji.bin;
+its newer format is rejected by this BOEC modem and is not a usable fallback.
+Do not substitute Broadcom/Samsung PSDS formats for Qualcomm XTRA.
+
+Stock Samsung also has secgps_set_xtra_enable: SECGPS v1 message 8, mandatory
+TLV 1 byte 1, reply TLV 1 byte 0 on accepted request. Its modem handler at
+0x8752b2f0 forwards the Boolean to PDSM parameter 0x2b. This is distinct from
+RF selector message 9 / parameter 0x2c. Apply the confirmed enable operation
+before injecting orbit data, only on a3lte. A successful enable ACK does not
+establish that the subsequent orbit data was accepted.
+
+The optional a3_gnss_psds_status probe defaults to a read-only LOC 0x37 query.
+It uses the real loc_qmi_idl_service_object_v02 exported by the existing blob
+and CCI raw TLVs. It reports the indication status and modem validity interval.
+--inject FILE explicitly sends LOC 0x35 parts and checks each modem status and
+part acknowledgement, bypassing HIDL, libloc_eng and the blob's injection code.
+--inject-xtra3 FILE tests LOC 0xa7 without the old format-type TLV; BOEC does not
+return its indication. No aiding-data deletion is performed by these probes.
+Wire field definitions are independently described in libqmi's LOC schema:
+https://github.com/linux-mobile-broadband/libqmi/blob/main/data/qmi-service-loc.json
+
+The normal XTRA3 file still fails at the final part even with raw QMI, matching
+the proprietary adapter's failure; modem-reported duration remains zero.
+The private XTRA enable operation is accepted but does not fix that rejection.
+UTC aiding corrects a 1024-week epoch discrepancy observed in the old modem's
+validity report, but does not itself make the data valid. Do not claim this
+proves the precise cause of the parser failure or stock-equivalent operation.
+CQI1 CP firmware from the supplied Android 6 CSG3 archive has been extracted
+for a separately authorized compatibility test. BOEC remains installed; no
+direct writes to modem, EFS or NV partitions are performed by these changes.

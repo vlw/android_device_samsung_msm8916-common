@@ -5,13 +5,16 @@
 #include <iterator>
 #include <cstdio>
 #include <string>
+#include <cstring>
+#include <ctime>
 
 int main(int argc, char** argv) {
-    if (argc != 2) {
-        std::fprintf(stderr, "Usage: a3_gnss_psds_test downloaded-xtra-file\n");
+    const bool timeAid = argc == 3 && !std::strcmp(argv[1], "--inject-time");
+    if (argc != 2 && !timeAid) {
+        std::fprintf(stderr, "Usage: a3_gnss_psds_test [--inject-time] downloaded-xtra-file\n");
         return 2;
     }
-    std::ifstream input(argv[1], std::ios::binary | std::ios::ate);
+    std::ifstream input(argv[timeAid ? 2 : 1], std::ios::binary | std::ios::ate);
     if (!input || input.tellg() <= 0 || input.tellg() > 1000000) {
         std::fprintf(stderr, "Missing, empty or oversized assistance file\n");
         return 1;
@@ -24,6 +27,15 @@ int main(int argc, char** argv) {
     }
     auto gnss = android::hardware::gnss::V1_0::IGnss::getService();
     if (!gnss) return 1;
+    if (timeAid) {
+        timespec utc{}, elapsed{};
+        if (clock_gettime(CLOCK_REALTIME, &utc) || clock_gettime(CLOCK_BOOTTIME, &elapsed)) return 1;
+        const int64_t now = int64_t(utc.tv_sec) * 1000 + utc.tv_nsec / 1000000;
+        const int64_t reference = int64_t(elapsed.tv_sec) * 1000 + elapsed.tv_nsec / 1000000;
+        auto timeResult = gnss->injectTime(now, reference, 1000);
+        if (!timeResult.isOk() || !static_cast<bool>(timeResult)) return 1;
+        std::printf("Time aiding queued: utcMs=%lld uncertaintyMs=1000\n", static_cast<long long>(now));
+    }
     auto extension = gnss->getExtensionXtra();
     if (!extension.isOk()) return 1;
     android::sp<android::hardware::gnss::V1_0::IGnssXtra> xtra = extension;
