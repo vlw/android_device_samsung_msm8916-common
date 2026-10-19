@@ -72,7 +72,8 @@ struct LocEngInjectXtraData : public LocMsg {
         delete[] mData;
     }
     inline virtual void proc() const {
-        mAdapter->setXtraData(mData, mLen);
+        const auto result = mAdapter->setXtraData(mData, mLen);
+        LOC_LOGI("XTRA adapter submission: bytes=%d return=%d", mLen, result);
     }
     inline  void locallog() const {
         LOC_LOGV("length: %d\n  data: %p", mLen, mData);
