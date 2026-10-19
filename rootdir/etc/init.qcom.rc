@@ -29,14 +29,13 @@ import /vendor/etc/init/hw/init.qcom.power.rc
 import /vendor/etc/init/hw/init.qcom.usb.rc
 import /vendor/etc/init/hw/init.target.rc
 
-on early-init
-    # Kernel 3.10 has no cgroup2: give libprocessgroup a controller-less v1
-    # hierarchy for its uid_*/pid_* process groups, otherwise init cannot
-    # signal services and shutdown fails to unmount /data
+# Devices without the network BPF backport still need a v1 process hierarchy.
+on early-init && property:ro.kernel.ebpf.supported=false
     mount cgroup none /sys/fs/cgroup nodev noexec nosuid none,name=processgroup,context=u:object_r:cgroup_v2:s0
     chown system system /sys/fs/cgroup
     chmod 0755 /sys/fs/cgroup
 
+on early-init
     mount debugfs debugfs /sys/kernel/debug
     chmod 0755 /sys/kernel/debug
 

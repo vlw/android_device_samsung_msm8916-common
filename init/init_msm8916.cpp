@@ -54,7 +54,7 @@ using android::base::GetProperty;
 using android::base::ReadFileToString;
 using android::base::Trim;
 
-void property_override(char const prop[], char const value[], bool add = true)
+void property_override(char const prop[], char const value[], bool add)
 {
     auto pi = (prop_info *) __system_property_find(prop);
 

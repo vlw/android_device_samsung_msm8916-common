@@ -30,6 +30,8 @@
 #ifndef __INIT_MSM8916__H__
 #define __INIT_MSM8916__H__
 
+void property_override(char const prop[], char const value[], bool add = true);
+
 void set_dsds_properties();
 void set_gsm_properties();
 void set_lte_properties();
