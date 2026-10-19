@@ -8230,6 +8230,21 @@ void convertRilCellInfoListToHal(void *response, size_t responseLen, hidl_vec<Ce
         }
         rillCellInfo += 1;
     }
+
+    // The Samsung RIL can report entries of an unknown type. The framework
+    // turns those into null CellInfo objects and com.android.phone crashes.
+    size_t kept = 0;
+    for (size_t i = 0; i < records.size(); i++) {
+        int type = (int) records[i].cellInfoType;
+        if (type < RIL_CELL_INFO_TYPE_GSM || type > RIL_CELL_INFO_TYPE_TD_SCDMA) continue;
+        if (kept != i) records[kept] = records[i];
+        kept++;
+    }
+    if (kept != records.size()) {
+        RLOGW("convertRilCellInfoListToHal: dropped %zu cell info entries of unknown type",
+                records.size() - kept);
+        records.resize(kept);
+    }
 }
 
 int radio::cellInfoListInd(int slotId,
