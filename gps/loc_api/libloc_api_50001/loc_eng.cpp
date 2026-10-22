@@ -898,7 +898,10 @@ LocEngReportNmea::LocEngReportNmea(void* locEng,
                                    const char* data, int len) :
     LocMsg(), mLocEng(locEng), mNmea(new char[len+1]), mLen(len)
 {
-    strlcpy(mNmea, data, len+1);
+    // The callback supplies a length-delimited buffer, not necessarily a C string.
+    // HIDL additionally requires a terminator at the declared length.
+    memcpy(mNmea, data, len);
+    mNmea[len] = '\0';
     locallog();
 }
 void LocEngReportNmea::proc() const {

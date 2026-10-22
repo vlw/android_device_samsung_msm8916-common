@@ -97,3 +97,16 @@ LOCAL_MODULE_RELATIVE_PATH := hw
 LOCAL_HEADER_LIBRARIES := libgps.utils_headers libloc_core_headers
 
 include $(BUILD_SHARED_LIBRARY)
+
+# Optional regression probe; never added to PRODUCT_PACKAGES.
+include $(CLEAR_VARS)
+LOCAL_MODULE := a3_gnss_nmea_test
+LOCAL_UNINSTALLABLE_MODULE := true
+LOCAL_PROPRIETARY_MODULE := true
+LOCAL_MODULE_TAGS := optional
+LOCAL_SRC_FILES := ../../tests/nmea_boundary_test.cpp
+LOCAL_CFLAGS := -fno-short-enums -D_ANDROID_ -Wall -Wextra -Werror -Wno-unused-parameter -Wno-mismatched-tags
+LOCAL_C_INCLUDES := $(LOCAL_PATH) $(TARGET_OUT_HEADERS)/libflp
+LOCAL_HEADER_LIBRARIES := libhardware_headers libgps.utils_headers libloc_core_headers
+LOCAL_SHARED_LIBRARIES := libloc_eng libloc_core libgps.utils libhidlbase liblog libutils
+include $(BUILD_EXECUTABLE)
