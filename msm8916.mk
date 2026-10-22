@@ -126,7 +126,7 @@ PRODUCT_PACKAGES += \
 
 # Gatekeeper
 PRODUCT_PACKAGES += \
-    android.hardware.gatekeeper@1.0-service.software
+    $(if $(DEVICE_GATEKEEPER_SERVICE),$(DEVICE_GATEKEEPER_SERVICE),android.hardware.gatekeeper@1.0-service.software)
 
 # GPS
 PRODUCT_PACKAGES += \
@@ -177,7 +177,7 @@ PRODUCT_ENFORCE_VINTF_MANIFEST_OVERRIDE := true
 
 # Keymaster
 PRODUCT_PACKAGES += \
-    android.hardware.keymaster@4.1-service
+    $(if $(DEVICE_KEYMASTER_SERVICE),$(DEVICE_KEYMASTER_SERVICE),android.hardware.keymaster@4.1-service)
 
 # Lights
 PRODUCT_PACKAGES += \
