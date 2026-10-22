@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// LOC 0x37 read-only query; explicit --inject/--inject-xtra3 run raw integration tests.
+// LOC 0x37 read-only query; explicit --inject/--inject-xtra3 and --delete-aiding mutate assistance data.
 // Wire definitions: libqmi data/qmi-service-loc.json (LOC 0x35, 0x37, 0xa7).
 #include <dlfcn.h>
 #include <pthread.h>
@@ -30,9 +30,9 @@ uint64_t little(const uint8_t* p, size_t n) {
 }
 void indication(void*, unsigned int id, void* data, unsigned int length, void* cookie) {
     auto& r = *static_cast<Reply*>(cookie);
-    if (id != r.expected) return;
     auto* b = static_cast<const uint8_t*>(data);
     pthread_mutex_lock(&r.mutex);
+    if (id != r.expected) { pthread_mutex_unlock(&r.mutex); return; }
     for (size_t i = 0; i + 3 <= length;) {
         unsigned type = b[i]; size_t n = little(b + i + 1, 2); i += 3;
         if (n > length - i) break;
@@ -51,7 +51,8 @@ void indication(void*, unsigned int id, void* data, unsigned int length, void* c
 int main(int argc, char** argv) {
     const bool xtra3 = argc == 3 && !std::strcmp(argv[1], "--inject-xtra3");
     const bool inject = xtra3 || (argc == 3 && !std::strcmp(argv[1], "--inject"));
-    if (argc != 1 && !inject) return 2;
+    const bool clear = argc == 2 && !std::strcmp(argv[1], "--delete-aiding");
+    if (argc != 1 && !inject && !clear) return 2;
     static_assert(sizeof(OsParams) == 16, "ARM32 CCI ABI");
     void* loc = dlopen("libloc_api_v02.so", RTLD_NOW | RTLD_LOCAL);
     void* cci = dlopen("libqmi_cci.so", RTLD_NOW | RTLD_LOCAL);
@@ -79,12 +80,40 @@ int main(int argc, char** argv) {
         pthread_mutex_unlock(&r.mutex);
         return ok;
     };
+    if (clear) {
+        // QMI_LOC_DELETE_ASSIST_DATA 0x44: mandatory TLV 1, uint8 deleteAllFlag.
+        // Standard GNSS assistance only; not factory RF/NV calibration writes.
+        pthread_mutex_lock(&r.mutex); r.expected = 0x44; pthread_mutex_unlock(&r.mutex);
+        const uint8_t request[] = {1, 1, 0, 1};
+        uint8_t response[64]{}; unsigned size = 0;
+        rc = send(client, 0x44, request, sizeof(request), response, sizeof(response), &size, 1000);
+        bool responseOk = false;
+        for (size_t i = 0; i + 3 <= size && i + 3 <= sizeof(response);) {
+            unsigned type = response[i]; size_t n = little(response + i + 1, 2); i += 3;
+            if (n > size - i || n > sizeof(response) - i) break;
+            if (type == 2 && n == 4) {
+                unsigned result = little(response + i, 2), error = little(response + i + 2, 2);
+                std::printf("Delete aiding response: result=%u error=%u%s\n", result, error,
+                            result == 0 ? " (error field ignored on SUCCESS)" : "");
+                responseOk = result == 0;
+            }
+            i += n;
+        }
+        bool received = !rc && responseOk && waitIndication();
+        pthread_mutex_lock(&r.mutex);
+        bool ok = received && r.status == 0;
+        std::printf("Delete aiding: transport=%d response=%d indication=%d status=%u\n",
+                    rc, responseOk, received, r.status);
+        pthread_mutex_unlock(&r.mutex);
+        release(client); dlclose(cci); dlclose(loc);
+        return ok ? 0 : 1;
+    }
     if (inject) {
         std::ifstream input(argv[2], std::ios::binary | std::ios::ate);
         if (!input || input.tellg() <= 0 || input.tellg() > 100000) { release(client); return 1; }
         input.seekg(0);
         std::vector<uint8_t> bytes((std::istreambuf_iterator<char>(input)), std::istreambuf_iterator<char>());
-        r.expected = xtra3 ? 0xa7 : 0x35;
+        pthread_mutex_lock(&r.mutex); r.expected = xtra3 ? 0xa7 : 0x35; pthread_mutex_unlock(&r.mutex);
         const unsigned parts = (bytes.size() + 1023) / 1024;
         for (unsigned part = 1, offset = 0; part <= parts; ++part) {
             const unsigned count = bytes.size() - offset < 1024 ? bytes.size() - offset : 1024;
@@ -109,8 +138,7 @@ int main(int argc, char** argv) {
             if (!received || r.status || r.part != part) { release(client); return 1; }
             offset += count;
         }
-        r.expected = 0x37;
-        pthread_mutex_lock(&r.mutex); r.received = false; r.status = UINT32_MAX;
+        pthread_mutex_lock(&r.mutex); r.expected = 0x37; r.received = false; r.status = UINT32_MAX;
         pthread_mutex_unlock(&r.mutex);
     }
     uint8_t reply[64]{}; unsigned length = 0;

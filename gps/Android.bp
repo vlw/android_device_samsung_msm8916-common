@@ -48,3 +48,24 @@ cc_binary {
     shared_libs: ["libdl"],
     cflags: ["-Wall", "-Wextra", "-Werror"],
 }
+
+cc_binary {
+    name: "a3_gnss_stack_probe",
+    vendor: true,
+    installable: false,
+    srcs: ["tests/stack_probe.cpp"],
+    header_libs: ["libhardware_headers"],
+    shared_libs: ["libdl"],
+    cflags: ["-Wall", "-Wextra", "-Werror"],
+}
+
+cc_library_shared {
+    name: "gps.a3_stock_test",
+    vendor: true,
+    installable: false,
+    relative_install_path: "hw",
+    srcs: ["tests/stock_hal_bridge.cpp"],
+    header_libs: ["libhardware_headers"],
+    shared_libs: ["libdl"],
+    cflags: ["-Wall", "-Wextra", "-Werror"],
+}

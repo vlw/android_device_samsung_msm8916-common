@@ -197,9 +197,12 @@ The optional a3_gnss_stock_xtra_test takes a matching stock GPS HAL path and
 one to three existing orbit files. Unlike the encoder probe, it starts GNSS,
 injects UTC/orbits and runs Samsung initialization, which may update modem
 settings. Use only with authorized device testing and matching stock support
-libraries in an isolated linker path. Stop AND verify absence of the normal
-GNSS service for the entire probe; framework requests can start lazy services
-again. Its return value alone is not an orbit acceptance check.
+libraries in an isolated linker path. Verify that native tests have no competing modem clients. Keeping the GNSS
+HAL unavailable on a running Android framework can trigger watchdog restarts;
+do not use a long service blackout as a live isolation technique. Prefer a
+registered HIDL service with a temporary coherent stock backend, or a native
+test environment where the framework is not waiting for the service. Its
+return value alone is not an orbit acceptance check.
 
 The exact final-file rejection cause remains unproven: file validation,
 time/week interpretation and modem state are still candidates. In particular,
@@ -207,3 +210,75 @@ IDL presence of a command does not prove the running handler supports it;
 0x85 version-check calls fail in the saved stock/current logs despite having
 an IDL entry. Neither firmware flashing nor blind NV/checksum/time changes
 are justified as a demonstrated fix by this analysis.
+
+SM-A300F RF follow-up (2026-10-22)
+--------------------------------
+The supplied SER BRH1 AP/BTI3 CP archive is for SM-A300F (Android 5.0.2),
+not SM-A300FU.
+The phone reports board Rev01 and selects the corresponding A3 EUR DTB.
+All 24 modem.* / mba.mbn files in /firmware-modem/image match the supplied
+BTI3 CP archive byte for byte. No CP firmware was written during this work.
+
+In this stock libgps.utils, GNSS_RF_CONFIG points to sec_gps_conf+0x84,
+whose initializer stores 1. Offset +0x88 is the next setting in this build.
+The bridge does not access those private structures and already sends 1.
+The stock initialization also sends AGPS mode 7, XTRA enable 1 and CERT TYPE 15;
+that complete initialization did not restore reception in the controlled test.
+Do not infer antenna gain or an arbitrary GPIO mapping from these parameters.
+
+The optional a3_gnss_stack_probe drives a complete matching legacy GPS set in
+standalone mode and reports modem NMEA GSV, solution mode and valid-position
+callback counts, without coordinates. It takes HAL_PATH [SECONDS] [MODE].
+The native current/stock/current control used 90/120/90 seconds respectively.
+Maximum simultaneously measurable GPS/GLONASS SVs were 1/1 in all three runs;
+GPS/GLONASS peak C/N0 was 27/32, 27/30 and 30/28 dB-Hz. No run produced a fix.
+Sequential sky tests are not a calibrated receiver-sensitivity measurement.
+
+The first attempt to use the complete stock set under Android 12 hit an NMEA
+contract mismatch: Gnss::nmeaCb requires a NUL at data[length], but the stock
+buffer did not have one there. The optional gps.a3_stock_test adapter copies
+only that bounded NMEA payload and terminates it before forwarding callbacks.
+Its backend path is explicitly diagnostic (/data/local/tmp/gnss-rf-compare).
+With all five matching stock libraries and this adapter, HIDL delivered SV
+and NMEA callbacks for 120 seconds without a service crash; no fix resulted.
+The diagnostic adapter and native probe are non-installable build targets,
+not product backends. Temporary mounts were removed after comparison.
+
+The current source also used strlcpy on a length-delimited NMEA input.
+Copy exactly len readable bytes and append a NUL at len; neither assume a
+source terminator nor leave the declared boundary uninitialized after an
+earlier NUL. a3_gnss_nmea_test exercises the real message constructor/proc
+and HIDL external-string check, including a guard-page source and embedded NUL.
+It is an optional non-installable target. This fixes a buffer contract;
+it is not evidence of increased RF sensitivity.
+
+A read-only snapshot of MSM8916 GPIO96 showed cfg=0x200/io=3 while GNSS was
+active and cfg=1/io=0 after stop. No GPIO request, pinmux change or MMIO write
+was made by the snapshot. The hardware L18 enable register was 0x80, with
+ULT-PLDO voltage selection 0x4c (2.7 V), matching the stock L18 DT setting.
+An AP regulator sysfs state of disabled did not mean this modem-voted rail
+was physically disabled. Do not add an always-on vote or change voltage just
+from that cached AP state. The FU schematic was only a circuit reference;
+these runtime pin/PMIC observations were made on the F handset itself.
+
+An uninterrupted receiver test with Wi-Fi on/off/on did not show reproducible
+recovery on disabling Wi-Fi. The explicit --delete-aiding option of
+a3_gnss_psds_status sends LOC 0x44 with deleteAllFlag=1 and requires both the
+common QMI response and final modem indication. BTI3 acknowledged it with
+status=SUCCESS; a subsequent 120-second standalone session still had no fix.
+This command removes GNSS aiding data and is never sent by the default query.
+It does not write factory RF calibration or EFS partitions directly.
+
+The early native-isolation runs caused Android framework watchdog restarts
+while the HAL was unavailable. Kernel boot_id did not change. Subsequent
+registered-HIDL stock and fixed-production runs kept system_server stable.
+The weak-reception cause remains unresolved; no speculative RF/voltage/NV
+change is presented as a fix. Antenna, environment, and untested differences
+from the complete stock OS remain possible. A full stock kernel/OS comparison
+was not performed because the user prohibited reboots.
+
+Build-only Soong diagnostic outputs for the current a3lte ARM variant:
+  m out/soong/.intermediates/device/samsung/msm8916-common/gps/a3_gnss_stack_probe/android_arm_armv8-a/a3_gnss_stack_probe
+  m out/soong/.intermediates/device/samsung/msm8916-common/gps/gps.a3_stock_test/android_arm_armv8-a_shared/gps.a3_stock_test.so
+Non-installable Soong targets are intentionally not exported as installed
+Make module aliases. Build a3_gnss_nmea_test by its ordinary Make module name.
