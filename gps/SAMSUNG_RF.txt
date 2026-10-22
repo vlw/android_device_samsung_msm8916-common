@@ -239,8 +239,10 @@ contract mismatch: Gnss::nmeaCb requires a NUL at data[length], but the stock
 buffer did not have one there. The optional gps.a3_stock_test adapter copies
 only that bounded NMEA payload and terminates it before forwarding callbacks.
 Its backend path is explicitly diagnostic (/data/local/tmp/gnss-rf-compare).
-With all five matching stock libraries and this adapter, HIDL delivered SV
-and NMEA callbacks for 120 seconds without a service crash; no fix resulted.
+With all five matching stock libraries and this adapter, HIDL delivered
+NMEA callbacks for 120 seconds without a service crash; no fix resulted.
+The stock legacy SV layout is not AOSP-compatible: its HIDL SV values from
+that early adapter must not be used as satellite measurements.
 The diagnostic adapter and native probe are non-installable build targets,
 not product backends. Temporary mounts were removed after comparison.
 
@@ -282,3 +284,55 @@ Build-only Soong diagnostic outputs for the current a3lte ARM variant:
   m out/soong/.intermediates/device/samsung/msm8916-common/gps/gps.a3_stock_test/android_arm_armv8-a_shared/gps.a3_stock_test.so
 Non-installable Soong targets are intentionally not exported as installed
 Make module aliases. Build a3_gnss_nmea_test by its ordinary Make module name.
+
+SM-A300F kernel-interface follow-up (2026-10-22)
+-----------------------------------------------
+strace covered a fresh stock native initialization/start/stop with a registered
+Android GNSS service left available, plus a stock HIDL session under the real
+GNSS UID. All 14 native Qualcomm IPC Router ioctls succeeded. SoC identification
+sysfs reads and the qmux_radio socket connection succeeded. /dev/smem_log is
+absent because CONFIG_MSM_SMEM_LOGGING is disabled; its driver is a shared-memory
+logger. /etc/qmi_fw.conf is absent in the supplied stock system image too.
+This trace does not cover every optional GPS feature or the full stock RIL.
+
+Stock libloc_eng opens /sys/class/power_supply/battery/gps on start/stop.
+That node exists, but the Android 12 GNSS service got DAC EACCES (root:root 0664).
+The stock OS instead runs the legacy HAL inside the system UID, and stock init
+chowns that node system:radio. In sec_battery.c the write only sets EVENT_GPS;
+sec_bat_temperature selects charging-temperature thresholds when event_check
+is enabled. It does not control an antenna, LNA pin, RF filter or regulator.
+No product permission/policy change was added for this diagnostic-only backend.
+
+A further registered-HIDL comparison used the stock liblbs_core/libizat_core
+as well as the five original GPS binaries, and temporarily allowed the GNSS
+UID to write the battery flag. All temporary library mounts and node ownership
+were restored afterwards. In 90 seconds there were 1195 NMEA sentences and no
+fix; complete modem GSV cycles contained at most 3 positive-C/N0 GPS and
+1 GLONASS, peaking at 28/24 dB-Hz. This was not a cold TTFF measurement and does
+not demonstrate an improvement over the earlier sequential trials.
+The optional stock adapter now drops the incompatible legacy SV callback;
+its receiver measurements come from NMEA GSV, not misinterpreted SV structures.
+Production SV conversion is unchanged.
+
+A separate, real kernel mismatch was found below the HAL. The stock and current
+DTs declare memshare,peripheral with a guaranteed 0x200000-byte modem GPS client.
+The decompressed SM-A300F stock kernel contains that compatible string; our
+driver accepted only qcom,memshare-peripheral. On the live phone the parent was
+bound but qcom,client_1 had no driver. A read-only one-shot snapshot found slot 0
+with nonzero physical/virtual allocation cookies, but size/alloted/guarantee=0.
+This matches the legacy request handler, which allocated a DMA buffer without
+recording its size/allocation state. Thus memory was allocated through the
+fallback path; this is NOT proof that the modem had no memory or that this bug
+caused its low C/N0.
+
+Kernel commits 9c359bb3aa88 and 03323f6fc3ea accept the legacy compatible,
+register the child driver before parent probing, advertise QMI after initial
+client allocation, track legacy allocation ownership/size, bound replies to the
+actual available size, and validate/free/reset non-guaranteed DMA allocations
+with matching DMA attributes and allocation/free serialization. Guaranteed
+buffers are retained. The host regression test extracts the real handlers and
+checks reuse, size bounds, failed/zero allocations, stale handles, proper DMA
+release, guaranteed retention and transport-error unlock under ASan/UBSan.
+The ARM driver and full zImage-dtb build succeeded. No new kernel was flashed,
+no modem was restarted, and no runtime rebinding of its in-use memory was tried.
+The effect of these kernel changes on reception remains untested.

@@ -11,6 +11,11 @@ pthread_once_t once = PTHREAD_ONCE_INIT;
 const GpsInterface* realGps;
 GpsInterface wrapped{};
 GpsCallbacks caller{}, forwarded{};
+void sv(GpsSvStatus*) {
+    // Samsung extends the legacy SV layout. Forwarding it as AOSP data gives
+    // invalid PRNs/C/N0 and may read beyond its list. This comparison uses NMEA
+    // GSV for satellite measurements; do not invent an ABI conversion here.
+}
 void nmea(GpsUtcTime timestamp, const char* data, int length) {
     if (!caller.nmea_cb || !data || length <= 0 || length > 4096) return;
     // The stock buffer is length-delimited; Android 12 HIDL also requires data[length]==0.
@@ -20,7 +25,7 @@ void nmea(GpsUtcTime timestamp, const char* data, int length) {
 int init(GpsCallbacks* callbacks) {
     if (!callbacks) return -1;
     caller = {}; std::memcpy(&caller, callbacks, callbacks->size < sizeof(caller) ? callbacks->size : sizeof(caller));
-    forwarded = caller; forwarded.nmea_cb = nmea;
+    forwarded = caller; forwarded.nmea_cb = nmea; forwarded.sv_status_cb = sv;
     return realGps->init(&forwarded);
 }
 void load() {
