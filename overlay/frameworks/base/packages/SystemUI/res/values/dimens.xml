@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The keyguard lock icon view is 2 x 36dp, but its padding is 48px, tuned
+         for ~2.75 density. At hdpi that leaves a 12px icon; 18dp keeps the
+         intended ~36dp glyph on every density. -->
+    <dimen name="lock_icon_padding">18dp</dimen>
+</resources>
