@@ -72,6 +72,9 @@ ro.frp.pst=/dev/block/bootdevice/by-name/persist
 debug.stagefright.omx_default_rank.sw-audio=1
 debug.stagefright.omx_default_rank=0
 drm.service.enabled=1
+# Codec2 software codecs: system heap only (1 << ION_SYSTEM_HEAP_ID), the
+# default mask falls through to the modem carveout when small heaps run out
+ro.com.android.media.swcodec.ion.heapmask=33554432
 vidc.enc.narrow.searchrange=1
 
 # Memory optimizations
